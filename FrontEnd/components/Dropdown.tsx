@@ -6,11 +6,11 @@ interface DropdownProps {
   value: string;
   onSelect: (item: string) => void;
   width?: number;
-  isOpen: boolean;           // <--- nhận trạng thái mở từ cha
-  onToggle: () => void;      // <--- gọi khi click để mở/đóng
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
-export default function Dropdown({ items, value, onSelect, width = 110, isOpen, onToggle }: DropdownProps) {
+export default function Dropdown({ items, value, onSelect, width = 80, isOpen, onToggle }: DropdownProps) {
   const [layout, setLayout] = useState<LayoutRectangle | null>(null);
   const dropdownRef = useRef<View>(null);
 
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",       // căn giữa chiều dọc
+    alignItems: "center",
   },
   dropdown: {
     position: "absolute",

@@ -1,7 +1,7 @@
-import { useState, useRef } from "react";
-import { View, Text, Image, TouchableOpacity, FlatList } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
+import { useRef, useState } from "react";
+import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 
 const steps = [
   {
@@ -11,15 +11,15 @@ const steps = [
     image: require("../../assets/images/templateOnboarding.png"),
   },
   {
-    title: "Xây dựng chiến lược\nvượt trội!",
+    title: "Mô phỏng lượt đi \nTỐC ĐỘ CAO",
     description:
-      "Biết trước lượt đi cho phép bạn tính toán combo, buff – debuff và tối ưu mọi quyết định chiến đấu.",
+      "Chỉ cần nhập Tốc độ, Speed Rail sẽ tự động trực quan hóa thứ tự hành động trên thanh, mô phỏng ảnh hưởng tăng/giảm tốc, giúp bạn tối ưu hóa đội hình một cách nhanh chóng.",
     image: require("../../assets/images/templateOnboarding.png"),
   },
   {
-    title: "Sử dụng dễ dàng,\nhỗ trợ mọi tựa game!",
+    title: "Cực kỳ hiệu quả \nvà vượt trội!",
     description:
-      "Giao diện trực quan, tốc độ cao và chính xác. Dù bạn chơi game nào, Speed Rail đều hỗ trợ.",
+      "Tất cả gói gọn trong một: Nhập liệu, mô phỏng tức thì, lưu đội hình và thiết kế di động giúp việc tối ưu tốc độ chưa bao giờ dễ dàng đến thế!",
     image: require("../../assets/images/templateOnboarding.png"),
   },
 ];
@@ -37,19 +37,16 @@ export default function OnboardingScreen() {
 
   return (
     <View className="flex-1 bg-[#0C1220]">
-      {/* Background stars */}
       <Image
         source={require("../../assets/images/background.png")}
-        className="absolute w-full h-full opacity-70"
+        className="flex-1"
         resizeMode="cover"
       />
 
-      {/* Title */}
       <Text className="text-white text-center mt-20 text-3xl font-semibold">
         Speed Rail
       </Text>
 
-      {/* Slide content */}
       <View className="flex-1 mt-10">
         <FlatList
           ref={flatListRef}
@@ -89,9 +86,7 @@ export default function OnboardingScreen() {
         />
       </View>
 
-      {/* Buttons */}
       <View className="w-full px-6 mb-16">
-        {/* Next */}
         <TouchableOpacity
           className="bg-[#5568A0] py-3 rounded-xl"
           onPress={() => {
@@ -110,7 +105,6 @@ export default function OnboardingScreen() {
           </Text>
         </TouchableOpacity>
 
-        {/* Skip */}
         <TouchableOpacity onPress={handleDone}>
           <Text className="text-white/60 text-center text-lg mt-4">Skip</Text>
         </TouchableOpacity>
