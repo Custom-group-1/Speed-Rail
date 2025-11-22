@@ -36,6 +36,6 @@ export default function Index() {
   }
 
   // Nếu đã xem -> vào Main
-  return <Redirect href="/onboarding" />;
+  return <Redirect href="/home" />;
 }
 
