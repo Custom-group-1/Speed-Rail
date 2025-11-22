@@ -26,7 +26,7 @@ export default function RootLayout() {
       <StatusBar hidden />
 
       {/* Navbar */}
-      {!(isOnboarding && isAuth) && (
+      {!(isOnboarding || isAuth) && (
         <View style={styles.navbar}>
           <Text style={styles.title}>Speed Rail</Text>
 
