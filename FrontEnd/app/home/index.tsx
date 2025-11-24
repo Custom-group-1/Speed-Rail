@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import { Animated, Image, ImageBackground, Text, TextInput, TouchableOpacity, View } from "react-native";
 import Dropdown from "../../components/Dropdown";
@@ -5,6 +6,8 @@ import SelectTab, { SelectItem } from "../../components/SelectTab";
 
 
 export default function HomeScreen() {
+  const router = useRouter();
+  
   const [currentChar, setCurrentChar] = useState(1);
   const [characters, setCharacters] = useState<string[]>(["", "", "", ""]);
   const highlightAnim = useRef(new Animated.Value(0)).current;
@@ -93,6 +96,7 @@ export default function HomeScreen() {
   const handlePressSelect = (
     context: "characters" | "lightcones" | "relicSet" | "planarSet"
   ) => {
+    setOpenDropdown(null);
     setOpenSelectTab(context);
   };
 
@@ -327,13 +331,17 @@ export default function HomeScreen() {
               placeholderTextColor="#555"
               keyboardType="numeric"
               value={characterData[currentChar].spd}
-              onChangeText={(val) => 
+              onFocus={() => {
+                setOpenDropdown(null);      // đóng dropdown
+                setOpenSelectTab(null);     // đóng select tab
+              }}
+              onChangeText={(val) =>
                 setCharacterData({
                   ...characterData,
                   [currentChar]: {
                     ...characterData[currentChar],
                     spd: val,
-                  }
+                  },
                 })
               }
             />
@@ -343,11 +351,11 @@ export default function HomeScreen() {
         {/* Buttons */}
         <View className="flex-col px-3 mt-5">
           <View className="flex-row justify-between">
-            <TouchableOpacity className="px-6 py-2 bg-[#c7c29b] rounded-xl flex-row items-center">
+            <TouchableOpacity className="px-6 py-2 bg-[#c7c29b] rounded-xl flex-row items-center" onPress={() => router.replace("/home/layout")}>
               <Text className="font-medium text-lg mr-2">Preset</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity className="px-8 py-2 bg-[#c7c29b] rounded-xl">
+            <TouchableOpacity className="px-8 py-2 bg-[#c7c29b] rounded-xl" onPress={() => router.replace("/home/save")}>
               <Text className="font-medium text-lg">Save</Text>
             </TouchableOpacity>
           </View>
