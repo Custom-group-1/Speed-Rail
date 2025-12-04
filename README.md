@@ -39,3 +39,49 @@ npx expo start
 ### Note
 - Make sure you have Node.js and npm installed before starting.
 - If you want to test on a mobile device, install the Expo Go app from the App Store or Google Play.
+
+## 🧪 Testing Guide
+
+
+
+This project uses **Jest** and **React Native Testing Library** to test both UI components and application logic.
+
+
+### 1. Run all tests
+
+
+```bash
+npm run test
+```
+
+
+This command will:
+
+
+- Execute all test files inside the `__tests__/` directory
+- Display pass/fail results in the terminal
+- Automatically watch file changes in development mode
+
+
+### 2. Run tests with coverage report
+
+
+```bash
+npm run test:coverage
+```
+
+
+This command will:
+
+
+- Generate a **coverage report**
+- Export results to:
+
+
+```
+coverage/
+└── index.html
+```
+
+
+You can open `coverage/index.html` in your browser to view a detailed coverage dashboard (statements, branches, functions, lines).
