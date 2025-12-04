@@ -28,7 +28,7 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
-          cache: -dependency-path: 'FrontEnd/package-lock.json'
+          cache-dependency-path: 'FrontEnd/package-lock.json'
 
       - name: Install dependencies
         run: npm ci
@@ -55,7 +55,7 @@ jobs:
           retention-days: 7
 
 
-     - name: SonarQube Scan
+      - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
         with:
           args: >
