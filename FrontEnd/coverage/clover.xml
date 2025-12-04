@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1764832297232" clover="3.2.0">
+  <project timestamp="1764832297232" name="All files">
+    <metrics statements="99" coveredstatements="92" conditionals="61" coveredconditionals="59" methods="52" coveredmethods="45" elements="212" coveredelements="196" complexity="0" loc="99" ncloc="99" packages="2" files="4" classes="4"/>
+    <package name="home">
+      <metrics statements="82" coveredstatements="75" conditionals="57" coveredconditionals="55" methods="44" coveredmethods="37"/>
+      <file name="index.tsx" path="C:\Users\pc\OneDrive\Desktop\Speed-Rail\FrontEnd\app\home\index.tsx">
+        <metrics statements="68" coveredstatements="68" conditionals="53" coveredconditionals="53" methods="30" coveredmethods="30"/>
+        <line num="9" count="225" type="stmt"/>
+        <line num="11" count="225" type="stmt"/>
+        <line num="12" count="225" type="stmt"/>
+        <line num="13" count="225" type="stmt"/>
+        <line num="14" count="225" type="stmt"/>
+        <line num="16" count="225" type="stmt"/>
+        <line num="17" count="225" type="stmt"/>
+        <line num="18" count="225" type="stmt"/>
+        <line num="20" count="225" type="stmt"/>
+        <line num="21" count="225" type="stmt"/>
+        <line num="22" count="225" type="stmt"/>
+        <line num="25" count="225" type="stmt"/>
+        <line num="32" count="225" type="stmt"/>
+        <line num="37" count="225" type="stmt"/>
+        <line num="56" count="225" type="stmt"/>
+        <line num="67" count="225" type="stmt"/>
+        <line num="83" count="225" type="stmt"/>
+        <line num="84" count="19" type="cond" truecount="2" falsecount="0"/>
+        <line num="85" count="7" type="stmt"/>
+        <line num="87" count="12" type="stmt"/>
+        <line num="88" count="12" type="stmt"/>
+        <line num="96" count="225" type="stmt"/>
+        <line num="99" count="22" type="stmt"/>
+        <line num="100" count="22" type="stmt"/>
+        <line num="103" count="225" type="stmt"/>
+        <line num="104" count="16" type="stmt"/>
+        <line num="105" count="16" type="stmt"/>
+        <line num="106" count="16" type="cond" truecount="5" falsecount="0"/>
+        <line num="108" count="4" type="stmt"/>
+        <line num="109" count="4" type="stmt"/>
+        <line num="110" count="4" type="stmt"/>
+        <line num="111" count="4" type="stmt"/>
+        <line num="113" count="3" type="stmt"/>
+        <line num="115" count="4" type="stmt"/>
+        <line num="117" count="4" type="stmt"/>
+        <line num="119" count="1" type="stmt"/>
+        <line num="122" count="16" type="stmt"/>
+        <line num="125" count="225" type="stmt"/>
+        <line num="166" count="900" type="stmt"/>
+        <line num="170" count="4" type="stmt"/>
+        <line num="171" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="177" count="19" type="stmt"/>
+        <line num="202" count="3" type="stmt"/>
+        <line num="209" count="13" type="cond" truecount="2" falsecount="0"/>
+        <line num="224" count="1" type="stmt"/>
+        <line num="231" count="7" type="cond" truecount="2" falsecount="0"/>
+        <line num="242" count="8" type="stmt"/>
+        <line num="262" count="3" type="stmt"/>
+        <line num="269" count="8" type="cond" truecount="2" falsecount="0"/>
+        <line num="280" count="5" type="stmt"/>
+        <line num="290" count="2" type="stmt"/>
+        <line num="316" count="7" type="stmt"/>
+        <line num="337" count="4" type="stmt"/>
+        <line num="338" count="4" type="stmt"/>
+        <line num="341" count="10" type="stmt"/>
+        <line num="356" count="1" type="stmt"/>
+        <line num="360" count="1" type="stmt"/>
+        <line num="384" count="2" type="stmt"/>
+        <line num="385" count="2" type="cond" truecount="4" falsecount="0"/>
+        <line num="386" count="2" type="stmt"/>
+        <line num="389" count="3" type="stmt"/>
+        <line num="390" count="3" type="cond" truecount="4" falsecount="0"/>
+        <line num="391" count="3" type="stmt"/>
+        <line num="399" count="7" type="stmt"/>
+        <line num="400" count="7" type="stmt"/>
+        <line num="412" count="9" type="stmt"/>
+        <line num="418" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="440" count="1" type="stmt"/>
+      </file>
+      <file name="layout.tsx" path="C:\Users\pc\OneDrive\Desktop\Speed-Rail\FrontEnd\app\home\layout.tsx">
+        <metrics statements="7" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="7" coveredmethods="0"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="8" count="0" type="stmt"/>
+        <line num="10" count="0" type="stmt"/>
+        <line num="20" count="0" type="stmt"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="38" count="0" type="stmt"/>
+        <line num="69" count="0" type="stmt"/>
+      </file>
+      <file name="save.tsx" path="C:\Users\pc\OneDrive\Desktop\Speed-Rail\FrontEnd\app\home\save.tsx">
+        <metrics statements="7" coveredstatements="7" conditionals="2" coveredconditionals="2" methods="7" coveredmethods="7"/>
+        <line num="7" count="8" type="stmt"/>
+        <line num="8" count="8" type="stmt"/>
+        <line num="10" count="8" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+        <line num="35" count="24" type="stmt"/>
+        <line num="38" count="3" type="stmt"/>
+        <line num="59" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="onboarding">
+      <metrics statements="17" coveredstatements="17" conditionals="4" coveredconditionals="4" methods="8" coveredmethods="8"/>
+      <file name="index.tsx" path="C:\Users\pc\OneDrive\Desktop\Speed-Rail\FrontEnd\app\onboarding\index.tsx">
+        <metrics statements="17" coveredstatements="17" conditionals="4" coveredconditionals="4" methods="8" coveredmethods="8"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="28" count="48" type="stmt"/>
+        <line num="29" count="48" type="stmt"/>
+        <line num="30" count="48" type="stmt"/>
+        <line num="32" count="48" type="stmt"/>
+        <line num="33" count="13" type="stmt"/>
+        <line num="34" count="13" type="stmt"/>
+        <line num="37" count="48" type="stmt"/>
+        <line num="56" count="224" type="stmt"/>
+        <line num="57" count="33" type="stmt"/>
+        <line num="64" count="1" type="stmt"/>
+        <line num="65" count="1" type="stmt"/>
+        <line num="68" count="1" type="stmt"/>
+        <line num="71" count="144" type="stmt"/>
+        <line num="99" count="17" type="cond" truecount="2" falsecount="0"/>
+        <line num="100" count="16" type="stmt"/>
+        <line num="105" count="1" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>
