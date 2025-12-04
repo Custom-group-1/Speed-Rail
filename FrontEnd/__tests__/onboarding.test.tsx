@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
-import OnboardingScreen from './index';
+import OnboardingScreen from '../app/onboarding/index';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 

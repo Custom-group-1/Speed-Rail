@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
-import HomeScreen from './index';
-import Dropdown from '../../components/Dropdown';
-import SelectTab from '../../components/SelectTab';
+import HomeScreen from '../app/home/index';
+import Dropdown from '../components/Dropdown';
+import SelectTab from '../components/SelectTab';
 
 // Mock the Dropdown component
 jest.mock('../../components/Dropdown', () => {
