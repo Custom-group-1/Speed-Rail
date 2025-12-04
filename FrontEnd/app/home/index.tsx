@@ -172,6 +172,7 @@ export default function HomeScreen() {
                 }}
               >
                 <TouchableOpacity
+                  testID={`character-slot-${i}`}
                   className="w-14 h-14 rounded-full bg-white items-center justify-center"
                   onPress={() => handlePress(i)}
                 >
@@ -285,6 +286,7 @@ export default function HomeScreen() {
 
               {/* Relic 2 */}
               <TouchableOpacity
+                testID="relic-2-button"
                 onPress={() => { setRelicSelectingSlot("relic2"); handlePressSelect("relicSet"); }}
                 disabled={characterData[currentChar].relicSet === "Set 4"}
                 className={`flex-1 flex-row items-center px-3 py-2 rounded-xl ${

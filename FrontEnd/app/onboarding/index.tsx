@@ -24,11 +24,10 @@ const steps = [
   },
 ];
 
-const flatListRef = useRef<FlatList<any>>(null);
-
 export default function OnboardingScreen() {
   const router = useRouter();
   const [index, setIndex] = useState(0);
+  const flatListRef = useRef<FlatList<any>>(null);
 
   const handleDone = async () => {
     await AsyncStorage.setItem("hasSeenOnboarding", "true");
@@ -48,12 +47,19 @@ export default function OnboardingScreen() {
 
         <View className="flex-1 mt-6">
           <FlatList
+            testID="onboarding-flatlist"
             ref={flatListRef}
             data={steps}
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
             keyExtractor={(_, i) => i.toString()}
+            getItemLayout={(_, index) => ({
+              length: 400,
+              offset: 400 * index,
+              index,
+            })}
+            onScrollToIndexFailed={() => {}}
             onScroll={(e) => {
               const x = e.nativeEvent.contentOffset.x;
               const newIndex = Math.round(
@@ -87,6 +93,7 @@ export default function OnboardingScreen() {
 
         <View className="w-full px-6 mb-8">
           <TouchableOpacity
+            testID="next-finish-button"
             className="bg-[#5568A0] py-3 rounded-xl"
             onPress={() => {
               if (index < steps.length - 1) {
@@ -104,7 +111,7 @@ export default function OnboardingScreen() {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={handleDone}>
+          <TouchableOpacity testID="skip-button" onPress={handleDone}>
             <Text className="text-white/60 text-center text-lg mt-4">Skip</Text>
           </TouchableOpacity>
         </View>

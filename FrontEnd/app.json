@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "demo-app",
-    "slug": "demo-app",
+    "slug": "speed-rail",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -48,7 +48,11 @@
       "reactCompiler": true
     },
     "extra": {
-      "router": {}
-    }
+      "router": {},
+      "eas": {
+        "projectId": "c4729296-3f80-4508-adf5-fdc05ab0b562"
+      }
+    },
+    "owner": "trantuankiet2004"
   }
 }
