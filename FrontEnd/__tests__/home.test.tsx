@@ -5,7 +5,7 @@ import Dropdown from '../components/Dropdown';
 import SelectTab from '../components/SelectTab';
 
 // Mock the Dropdown component
-jest.mock('../../components/Dropdown', () => {
+jest.mock('../components/Dropdown', () => {
   return jest.fn(({ value, onSelect, onToggle, isOpen }) => {
     const React = require('react');
     const { Text, TouchableOpacity, View } = require('react-native');
@@ -25,7 +25,7 @@ jest.mock('../../components/Dropdown', () => {
 });
 
 // Mock the SelectTab component
-jest.mock('../../components/SelectTab', () => {
+jest.mock('../components/SelectTab', () => {
   return jest.fn(({ onClose, onChoose, context, items }) => {
     const React = require('react');
     const { View, Text, TouchableOpacity } = require('react-native');
@@ -796,7 +796,7 @@ describe('HomeScreen', () => {
     
     it('handles unknown context in handleChoose', () => {
       // Override mock for this test
-      const SelectTab = require('../../components/SelectTab');
+      const SelectTab = require('../components/SelectTab');
       (SelectTab as jest.Mock).mockImplementationOnce(({ onChoose }) => {
         const React = require('react');
         const { TouchableOpacity, Text } = require('react-native');
