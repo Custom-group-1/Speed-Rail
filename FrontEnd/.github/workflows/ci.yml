@@ -32,7 +32,7 @@ jobs:
 
 
       - name: Run Jest Coverage Tests
-        run: npm run test:coverage
+        run: cd FrontEnd && npm run test:coverage
 
 
       - name: Check coverage files
