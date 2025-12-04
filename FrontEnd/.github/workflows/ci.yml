@@ -59,7 +59,10 @@ jobs:
           retention-days: 7
 
 
-      - name: SonarQube Scan
+     - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
+        with:
+          projectBaseDir: FrontEnd 
+            
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
