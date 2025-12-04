@@ -85,3 +85,7 @@ coverage/
 
 
 You can open `coverage/index.html` in your browser to view a detailed coverage dashboard (statements, branches, functions, lines).
+
+[![React Native CI - Test, Report & SonarCloud](https://github.com/Custom-group-1/Speed-Rail/actions/workflows/ci.yml/badge.svg)](https://github.com/Custom-group-1/Speed-Rail/actions/workflows/ci.yml)
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Custom-group-1_Speed-Rail&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Custom-group-1_Speed-Rail)
