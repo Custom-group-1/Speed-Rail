@@ -48,7 +48,13 @@ jest.mock('../components/SelectTab', () => {
 
 describe('HomeScreen', () => {
   beforeEach(() => {
+    jest.useFakeTimers();
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
   });
 
   describe('Rendering Tests', () => {
