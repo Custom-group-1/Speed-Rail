@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { ImageBackground, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import PresetBox from "../../components/PresentBox";
+import * as Sentry from "@sentry/react-native";
 
 export default function UserSave() {
   const router = useRouter();
@@ -54,14 +55,33 @@ export default function UserSave() {
 
         <View className="flex-col px-4 mt-12">
           <View className="flex-row justify-center items-center">
-            <TouchableOpacity
-              className="w-[40%] py-2 bg-[#c7c29b] rounded-xl flex-row justify-center items-center"
-              onPress={() => router.replace("/home")}
-            >
-              <Text className="font-medium text-lg text-center">Chọn</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                  className="w-[40%] py-2 bg-[#c7c29b] rounded-xl flex-row justify-center items-center"
+                  onPress={() => {
+                      console.log("=== TEST SENTRY: Crash tại nút Chọn ===");
+                      
+                      // Gửi message
+                      Sentry.captureMessage(
+                          "Test Sentry từ nút Chọn - test crash"
+                      );
+                      
+                      // Gửi exception
+                      Sentry.captureException(
+                          new Error(
+                              "SENTRY ERROR: Crash test - nút Chọn (error + sourcemaps + performance)"
+                          )
+                      );
+                      
+                      // Crash thật (Đây là dòng sẽ dừng ứng dụng)
+                      throw new Error(
+                          "CRASHED: Crash test từ nút Chọn - Sentry test"
+                      );
+                  }}
+              >
+                  <Text className="font-medium text-lg text-center">Chọn</Text>
+              </TouchableOpacity>
           </View>
-        </View>
+      </View>
       </View>
     </ImageBackground>
   );

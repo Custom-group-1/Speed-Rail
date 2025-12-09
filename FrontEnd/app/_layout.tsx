@@ -1,12 +1,67 @@
 import * as NavigationBar from 'expo-navigation-bar';
-import { Slot, usePathname } from 'expo-router';
+import { Slot, usePathname, useNavigationContainerRef  } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MiniProfile from '../components/MiniProfile';
 import '../global.css';
+import * as Sentry from '@sentry/react-native';
 
-export default function RootLayout() {
+const navigationIntegration = Sentry.reactNavigationIntegration();
+
+Sentry.init({
+  dsn: 'https://350ba636da458a1f7f461e67d216df94@o4510505015181312.ingest.us.sentry.io/4510505017475072',
+
+  tracePropagationTargets: ["https://myproject.org", /^\/api\//],
+  debug: true,
+
+  // Performance Monitoring
+  tracesSampleRate: 1.0, // Capture 100% transactions khi test
+  enableAutoSessionTracking: true,
+  sessionTrackingIntervalMillis: 5000,
+
+
+  // User Interaction Tracking
+  enableUserInteractionTracing: true,
+
+
+  // Profiling
+  profilesSampleRate: 1.0,  // Chưa cần thêm liền
+ 
+  // Session Replay
+  replaysSessionSampleRate: 1.0, // Ghi lại 100% session khi test // Chưa cần thêm liền
+  replaysOnErrorSampleRate: 1.0, // Ghi lại 100% khi có error // Chưa cần thêm liền
+
+  // Integrations
+  integrations: [
+    // Mobile replay integration with minimal configuration
+    // See: https://docs.sentry.io/platforms/react-native/session-replay/configuration/
+    Sentry.mobileReplayIntegration({
+      maskAllText: true,
+      maskAllImages: true,
+    }), // Chưa cần thêm liền
+    navigationIntegration,
+    Sentry.hermesProfilingIntegration({
+      platformProfilers: true,
+    }), // Chưa cần thêm liền
+  ],
+ 
+  // Privacy
+  sendDefaultPii: false, // Không gửi thông tin cá nhân mặc định
+  maxBreadcrumbs: 150,
+ 
+  // Enable native crash handling
+  enableNative: true,
+  enableNativeCrashHandling: true,
+  enableAutoPerformanceTracing: true,
+ 
+  // Debug configuration
+  _experiments: {
+    captureFailedRequests: true,
+  }, // Chưa cần thêm liền
+});
+
+function RootLayout() {
   const [showProfile, setShowProfile] = useState(false);
   const pathname = usePathname();
 
@@ -20,6 +75,21 @@ export default function RootLayout() {
       NavigationBar.setBehaviorAsync("inset-touch");
     }
   }, []);
+
+  // Đăng ký navigation container cho Sentry
+  const ref = useNavigationContainerRef();
+  useEffect(() => {
+    if (ref) {
+      navigationIntegration.registerNavigationContainer(ref);
+    }
+  }, [ref]);
+  // Thiết lập user context cho analytics
+  useEffect(() => {
+    Sentry.setUser({id: "custom_group_1_test", email: "nguyen.nguyentuankhoi@hcmut.edu.vn" ,username: "speedrail_test"
+    });
+    Sentry.setTag("group", "nhom-4-nguoi");
+  }, []);
+
 
   return (
     <View style={styles.container}>
@@ -47,7 +117,7 @@ export default function RootLayout() {
       <Slot />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -74,3 +144,5 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
 });
+
+export default Sentry.wrap(RootLayout);
