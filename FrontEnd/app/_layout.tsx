@@ -6,8 +6,12 @@ import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react
 import MiniProfile from '../components/MiniProfile';
 import '../global.css';
 import * as Sentry from '@sentry/react-native';
+import Constants from 'expo-constants'; // Thêm dòng này để kiểm tra Expo Go
 
 const navigationIntegration = Sentry.reactNavigationIntegration();
+
+// Kiểm tra xem có đang chạy trên Expo Go hay không
+const isExpoGo = Constants.appOwnership === 'expo';
 
 Sentry.init({
   dsn: 'https://350ba636da458a1f7f461e67d216df94@o4510505015181312.ingest.us.sentry.io/4510505017475072',
@@ -15,50 +19,40 @@ Sentry.init({
   tracePropagationTargets: ["https://myproject.org", /^\/api\//],
   debug: true,
 
-  // Performance Monitoring
-  tracesSampleRate: 1.0, // Capture 100% transactions khi test
+  tracesSampleRate: 1.0, 
   enableAutoSessionTracking: true,
   sessionTrackingIntervalMillis: 5000,
-
-
-  // User Interaction Tracking
   enableUserInteractionTracing: true,
 
+  profilesSampleRate: 1.0,  
+  replaysSessionSampleRate: 1.0, 
+  replaysOnErrorSampleRate: 1.0, 
 
-  // Profiling
-  profilesSampleRate: 1.0,  // Chưa cần thêm liền
- 
-  // Session Replay
-  replaysSessionSampleRate: 1.0, // Ghi lại 100% session khi test // Chưa cần thêm liền
-  replaysOnErrorSampleRate: 1.0, // Ghi lại 100% khi có error // Chưa cần thêm liền
-
-  // Integrations
   integrations: [
-    // Mobile replay integration with minimal configuration
-    // See: https://docs.sentry.io/platforms/react-native/session-replay/configuration/
-    Sentry.mobileReplayIntegration({
-      maskAllText: true,
-      maskAllImages: true,
-    }), // Chưa cần thêm liền
+    // SỬA Ở ĐÂY: Chỉ chạy các tính năng native nếu KHÔNG PHẢI Expo Go
+    ...(!isExpoGo ? [
+      Sentry.mobileReplayIntegration({
+        maskAllText: true,
+        maskAllImages: true,
+      }),
+      Sentry.hermesProfilingIntegration({
+        platformProfilers: true,
+      }),
+    ] : []),
     navigationIntegration,
-    Sentry.hermesProfilingIntegration({
-      platformProfilers: true,
-    }), // Chưa cần thêm liền
   ],
- 
-  // Privacy
-  sendDefaultPii: false, // Không gửi thông tin cá nhân mặc định
+  
+  sendDefaultPii: false, 
   maxBreadcrumbs: 150,
- 
-  // Enable native crash handling
-  enableNative: true,
-  enableNativeCrashHandling: true,
-  enableAutoPerformanceTracing: true,
- 
-  // Debug configuration
+  
+  // SỬA Ở ĐÂY: Tắt hẳn native khi đang dev trên Expo Go để tránh lỗi "Native Client"
+  enableNative: !isExpoGo,
+  enableNativeCrashHandling: !isExpoGo,
+  enableAutoPerformanceTracing: !isExpoGo,
+  
   _experiments: {
     captureFailedRequests: true,
-  }, // Chưa cần thêm liền
+  }, 
 });
 
 function RootLayout() {
@@ -68,7 +62,6 @@ function RootLayout() {
   const isOnboarding = pathname.startsWith('/onboarding');
   const isAuth = pathname.startsWith('/auth');
 
-  // Ẩn navigation bar Android
   useEffect(() => {
     if (Platform.OS === 'android') {
       NavigationBar.setVisibilityAsync('hidden');
@@ -76,26 +69,26 @@ function RootLayout() {
     }
   }, []);
 
-  // Đăng ký navigation container cho Sentry
   const ref = useNavigationContainerRef();
   useEffect(() => {
     if (ref) {
       navigationIntegration.registerNavigationContainer(ref);
     }
   }, [ref]);
-  // Thiết lập user context cho analytics
+
   useEffect(() => {
-    Sentry.setUser({id: "custom_group_1_test", email: "nguyen.nguyentuankhoi@hcmut.edu.vn" ,username: "speedrail_test"
+    Sentry.setUser({
+      id: "custom_group_1_test", 
+      email: "nguyen.nguyentuankhoi@hcmut.edu.vn",
+      username: "speedrail_test"
     });
     Sentry.setTag("group", "nhom-4-nguoi");
   }, []);
-
 
   return (
     <View style={styles.container}>
       <StatusBar hidden />
 
-      {/* Navbar */}
       {!(isOnboarding || isAuth) && (
         <View style={styles.navbar}>
           <Text style={styles.title}>Speed Rail</Text>
@@ -109,7 +102,6 @@ function RootLayout() {
         </View>
       )}
 
-      {/* MiniProfile */}
       {showProfile && !isOnboarding && (
         <MiniProfile onClose={() => setShowProfile(false)} />
       )}

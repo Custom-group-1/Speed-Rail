@@ -11,7 +11,6 @@ import {
 } from "react-native";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
-const SCREEN_WIDTH = Dimensions.get("window").width;
 
 export interface SelectItem {
   id: number;
@@ -27,26 +26,30 @@ interface SelectTabProps {
 }
 
 export default function SelectTab({ onClose, onChoose, context, items }: SelectTabProps) {
+  // 1. Khởi tạo vị trí bắt đầu là chiều cao màn hình (ẩn dưới đáy)
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
   const [selectedItem, setSelectedItem] = useState<number | null>(null);
 
   useEffect(() => {
-    setSelectedItem(null); // reset khi đổi context
+    setSelectedItem(null); 
   }, [context]);
 
   useEffect(() => {
-    Animated.timing(slideAnim, {
-      toValue: SCREEN_HEIGHT * 0.12,
-      duration: 250,
-      useNativeDriver: false,
+    // 2. Hiệu ứng trượt lên dùng spring cho mượt
+    Animated.spring(slideAnim, {
+      toValue: 0, // Trượt về vị trí gốc (sát đáy)
+      useNativeDriver: true, // Đã hỗ trợ vì dùng translateY
+      tension: 50,
+      friction: 10,
     }).start();
   }, []);
 
   const closeTab = () => {
+    // 3. Trượt xuống trước khi đóng
     Animated.timing(slideAnim, {
       toValue: SCREEN_HEIGHT,
-      duration: 200,
-      useNativeDriver: false,
+      duration: 250,
+      useNativeDriver: true,
     }).start(() => onClose());
   };
 
@@ -62,12 +65,21 @@ export default function SelectTab({ onClose, onChoose, context, items }: SelectT
 
   return (
     <View style={styles.wrapper}>
-      <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={closeTab} />
+      <TouchableOpacity 
+        style={styles.overlay} 
+        activeOpacity={1} 
+        onPress={closeTab} 
+      />
 
-      <Animated.View style={[styles.panel, { top: slideAnim }]}>
+      {/* 4. Thay đổi style top thành transform translateY */}
+      <Animated.View style={[
+        styles.panel, 
+        { transform: [{ translateY: slideAnim }] }
+      ]}>
+        <View style={styles.handle} />
         <Text style={styles.title}>{getTitle()}</Text>
 
-        <ScrollView style={{ flex: 1 }}>
+        <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
           <View style={styles.grid}>
             {items.map((item) => (
               <TouchableOpacity
@@ -76,15 +88,17 @@ export default function SelectTab({ onClose, onChoose, context, items }: SelectT
                 onPress={() => setSelectedItem(item.id)}
               >
                 <Image source={item.image} style={styles.itemImage} />
-                <Text style={styles.itemText}>{item.name}</Text>
+                <Text style={styles.itemText} numberOfLines={1}>{item.name}</Text>
               </TouchableOpacity>
             ))}
             <View style={styles.itemBoxEmpty} />
           </View>
         </ScrollView>
 
+        {/* Nút Choose luôn nằm trong Panel */}
         <TouchableOpacity
-          style={styles.chooseButton}
+          style={[styles.chooseButton, selectedItem === null && { opacity: 0.5 }]}
+          disabled={selectedItem === null}
           onPress={() => {
             if (selectedItem !== null) {
               const item = items.find((i) => i.id === selectedItem);
@@ -100,34 +114,43 @@ export default function SelectTab({ onClose, onChoose, context, items }: SelectT
   );
 }
 
-
 const styles = StyleSheet.create({
   wrapper: {
     position: "absolute",
     top: 0, left: 0, right: 0, bottom: 0,
     justifyContent: "flex-end",
+    zIndex: 1000,
   },
   overlay: {
     position: "absolute",
     top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0,0,0,0.6)",
   },
   panel: {
-    position: "absolute",
-    height: SCREEN_HEIGHT * 0.9,
-    width: SCREEN_WIDTH * 0.95,
+    // Fix: Dùng bottom: 0 và height cố định để nút Choose không bị lẹm
     backgroundColor: "#59659A",
-    borderRadius: 16,
+    width: "100%",
+    height: SCREEN_HEIGHT * 0.8, 
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
     paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingTop: 12,
+    paddingBottom: 30, // Đảm bảo nút không quá sát cạnh dưới
+  },
+  handle: {
+    width: 40,
+    height: 4,
+    backgroundColor: "rgba(255,255,255,0.3)",
+    borderRadius: 2,
     alignSelf: "center",
+    marginBottom: 15,
   },
   title: {
     color: "white",
     fontSize: 20,
     fontWeight: "600",
     textAlign: "center",
-    marginBottom: 10,
+    marginBottom: 15,
   },
   grid: {
     flexDirection: "row",
@@ -144,10 +167,11 @@ const styles = StyleSheet.create({
   },
   itemBoxSelected: {
     backgroundColor: "#292E53",
+    borderWidth: 2,
+    borderColor: "#C7B775",
   },
   itemBoxEmpty: {
     width: "48%",
-    marginBottom: 14,
   },
   itemImage: {
     width: 60,
@@ -157,19 +181,18 @@ const styles = StyleSheet.create({
   },
   itemText: {
     color: "white",
-    fontSize: 15,
+    fontSize: 14,
   },
   chooseButton: {
     backgroundColor: "#C7B775",
-    paddingVertical: 12,
-    borderRadius: 12,
-    marginBottom: 16,
-    marginTop: 6,
+    paddingVertical: 15,
+    borderRadius: 15,
+    marginTop: 10,
   },
   chooseText: {
     textAlign: "center",
     color: "black",
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: "bold",
   },
 });

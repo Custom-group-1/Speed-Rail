@@ -101,26 +101,56 @@ export default function HomeScreen() {
   };
 
   const handleChoose = (item: SelectItem, context: "characters" | "lightcones" | "relicSet" | "planarSet") => {
-    setCharacterData(prev => {
-      const char = prev[currentChar];
-      switch(context) {
-        case "characters":
-          const newChars = [...characters];
-          newChars[currentChar - 1] = item.name;
-          setCharacters(newChars);
-          return prev;
-        case "lightcones":
-          return { ...prev, [currentChar]: { ...char, lightcone: item.name } };
-        case "relicSet":
-          return { ...prev, [currentChar]: { ...char, [relicSelectingSlot]: item.name } };
-        case "planarSet":
-          return { ...prev, [currentChar]: { ...char, planarSet: item.name } };
-        default:
-          return prev;
+    // 1. Cập nhật mảng characters (Dùng cho vòng tròn phía trên và Timeline)
+    if (context === "characters") {
+      const newChars = [...characters]; // Clone mảng cũ
+      newChars[currentChar - 1] = item.name;
+      setCharacters(newChars);
+    }
+
+    // 2. Cập nhật object characterData (Dùng cho các nút bấm bên dưới)
+    setCharacterData(prev => ({
+      ...prev,
+      [currentChar]: {
+        ...prev[currentChar],
+        ...(context === "lightcones" && { lightcone: item.name }),
+        ...(context === "relicSet" && { [relicSelectingSlot]: item.name }),
+        ...(context === "planarSet" && { planarSet: item.name }),
       }
-    });
+    }));
+
     setOpenSelectTab(null);
   };
+
+  const actions = React.useMemo(() => {
+    const DEFAULT_SPD = 100;
+    const totalAvLimit = 150 + cycle * 100;
+    let allActions: { charIndex: number; name: string; av: number }[] = [];
+
+    [1, 2, 3, 4].forEach((idx) => {
+      const charName = characters[idx - 1];
+      if (!charName || charName === "") return; // Chỉ tính nếu đã chọn nhân vật
+
+      const rawSpd = parseFloat(characterData[idx].spd);
+      const spd = isNaN(rawSpd) || rawSpd <= 0 ? DEFAULT_SPD : rawSpd;
+
+      const actionInterval = 10000 / spd;
+      let accumulatedAv = actionInterval;
+
+      while (accumulatedAv <= totalAvLimit) {
+        allActions.push({
+          charIndex: idx,
+          name: charName,
+          av: accumulatedAv,
+        });
+        accumulatedAv += actionInterval;
+      }
+    });
+
+    return allActions.sort((a, b) => a.av - b.av);
+  }, [characters, characterData, cycle]); // Tự động chạy lại khi các giá trị này đổi
+
+  const totalAvLimit = 150 + cycle * 100;
 
   return (
     <ImageBackground
@@ -364,8 +394,70 @@ export default function HomeScreen() {
         </View>
 
         {/* === TIMELINE === */}
-        <View className="mt-10 items-center w-full py-12">
-          <View className="w-[90%] h-[3px] bg-white rounded-full" />
+        <View className="mt-12 mb-20 items-center w-full px-8">
+          <View className="w-full h-[3px] bg-white/60 rounded-full relative items-center justify-center">
+            
+            {/* Vạch mốc khởi đầu */}
+            <View className="absolute left-0 w-[2px] h-4 bg-white" />
+            
+            {/* Vòng lặp hiển thị các điểm hành động */}
+            {actions.map((action, index) => {
+              const position = (action.av / totalAvLimit) * 100;
+              
+              // Kiểm tra xem có ai hành động cùng lúc (trùng AV) không
+              const isDuplicateAV = index > 0 && Math.abs(actions[index - 1].av - action.av) < 0.1;
+              if (isDuplicateAV) return null; // Bỏ qua lượt này vì sẽ hiển thị gộp ở lượt trước
+
+              // Tìm tất cả nhân vật tại mốc AV này
+              const charsAtThisPoint = actions.filter(a => Math.abs(a.av - action.av) < 0.1);
+              
+              return (
+                <View 
+                  key={`point-${index}`} 
+                  className="absolute items-center" 
+                  style={{ left: `${position}%` }}
+                >
+                  {/* Điểm chấm trên thanh */}
+                  <View className="w-3 h-3 bg-yellow-400 rounded-full border-2 border-[#59659A] z-10" />
+
+                  {/* Render các nhân vật tại điểm này */}
+                  {charsAtThisPoint.map((char, charIdx) => {
+                    // Logic: 2 người đầu ở trên, người thứ 3-4 ở dưới
+                    const isTop = charIdx < 2; 
+                    const offset = isTop ? -45 - (charIdx * 35) : 15 + ((charIdx - 2) * 35);
+
+                    return (
+                      <View 
+                        key={`char-${char.charIndex}-${charIdx}`}
+                        className="absolute items-center w-12"
+                        style={{ top: offset }}
+                      >
+                        <View className="bg-[#c7c29b] w-10 h-10 rounded-full items-center justify-center border-2 border-white shadow-sm overflow-hidden">
+                          <Text className="text-[10px] font-bold text-[#59659A]">
+                            {char.name.split(' ').map(n => n[0]).join('')}
+                          </Text>
+                        </View>
+                        {/* Chỉ hiện AV ở icon gần thanh nhất để tránh rối */}
+                        {(charIdx === 0 || charIdx === 2) && (
+                          <Text className="text-white text-[8px] font-bold mt-1 bg-black/30 px-1 rounded">
+                            {Math.round(char.av)}
+                          </Text>
+                        )}
+                      </View>
+                    );
+                  })}
+                </View>
+              );
+            })}
+
+            {/* Vạch mốc kết thúc */}
+            <View className="absolute right-0 w-[2px] h-4 bg-white" />
+          </View>
+          
+          <View className="flex-row justify-between w-full mt-2">
+            <Text className="text-white/50 text-[10px]">0 AV</Text>
+            <Text className="text-white/50 text-[10px]">{totalAvLimit} AV (Max)</Text>
+          </View>
         </View>
 
         {/* === CYCLE BOX === */}
