@@ -125,18 +125,18 @@ export default function HomeScreen() {
   // 4. PLANAR ORNAMENT SETS (2-Piece)
   // ====================================================================
   const planarSetData: SelectItem[] = [
-    { id: 1, name: "Belobog of the Architects", image: require("../../assets/images/Planar/Belobog_of_the_Architects.png") },
-    { id: 2, name: "Broken Keel", image: require("../../assets/images/Planar/Broken_Keel.png") },
-    { id: 3, name: "Celestial Differentiator", image: require("../../assets/images/Planar/Celestial_Differentiator.png") },
-    { id: 4, name: "Firmament Frontline: Glamoth", image: require("../../assets/images/Planar/Firmament_Frontline_Glamoth.png") },
-    { id: 5, name: "Fleet of the Ageless", image: require("../../assets/images/Planar/Fleet_of_the_Ageless.png") },
-    { id: 6, name: "Inert Salsotto", image: require("../../assets/images/Planar/Inert_Salsotto.png") },
-    { id: 7, name: "Pan-Cosmic Commercial Enterprise", image: require("../../assets/images/Planar/Pan-Cosmic_Commercial_Enterprise.png") },
-    { id: 8, name: "Penacony, Land of the Dreams", image: require("../../assets/images/Planar/Penacony_Land_of_the_Dreams.png") },
-    { id: 9, name: "Rutilant Arena", image: require("../../assets/images/Planar/Rutilant_Arena.png") },
-    { id: 10, name: "Space Sealing Station", image: require("../../assets/images/Planar/Space_Sealing_Station.png") },
-    { id: 11, name: "Sprightly Vonwacq", image: require("../../assets/images/Planar/Sprightly_Vonwacq.png") },
-    { id: 12, name: "Talia: Kingdom of Banditry", image: require("../../assets/images/Planar/Talia_Kingdom_of_Banditry.png") },
+    { id: 1, name: "Belobog of the Architects", image: require("../../assets/images/Planars/Belobog_of_the_Architects.png") },
+    { id: 2, name: "Broken Keel", image: require("../../assets/images/Planars/Broken_Keel.png") },
+    { id: 3, name: "Celestial Differentiator", image: require("../../assets/images/Planars/Celestial_Differentiator.png") },
+    { id: 4, name: "Firmament Frontline: Glamoth", image: require("../../assets/images/Planars/Firmament_Frontline_Glamoth.png") },
+    { id: 5, name: "Fleet of the Ageless", image: require("../../assets/images/Planars/Fleet_of_the_Ageless.png") },
+    { id: 6, name: "Inert Salsotto", image: require("../../assets/images/Planars/Inert_Salsotto.png") },
+    { id: 7, name: "Pan-Cosmic Commercial Enterprise", image: require("../../assets/images/Planars/Pan-Cosmic_Commercial_Enterprise.png") },
+    { id: 8, name: "Penacony, Land of the Dreams", image: require("../../assets/images/Planars/Penacony_Land_of_the_Dreams.png") },
+    { id: 9, name: "Rutilant Arena", image: require("../../assets/images/Planars/Rutilant_Arena.png") },
+    { id: 10, name: "Space Sealing Station", image: require("../../assets/images/Planars/Space_Sealing_Station.png") },
+    { id: 11, name: "Sprightly Vonwacq", image: require("../../assets/images/Planars/Sprightly_Vonwacq.png") },
+    { id: 12, name: "Talia: Kingdom of Banditry", image: require("../../assets/images/Planars/Talia_Kingdom_of_Banditry.png") },
   ];
 
   // ====================================================================
