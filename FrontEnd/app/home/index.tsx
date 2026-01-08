@@ -219,12 +219,14 @@ export default function HomeScreen() {
 
   const actions = React.useMemo(() => {
     const DEFAULT_SPD = 100;
-    const totalAvLimit = 150 + cycle * 100;
+    const lowerAvLimit = cycle === 0 ? 0 : 150 + (cycle - 1) * 100;
+    const upperAvLimit = 150 + cycle * 100;
+    
     let allActions: { charIndex: number; name: string; av: number }[] = [];
 
     [1, 2, 3, 4].forEach((idx) => {
       const charName = characters[idx - 1];
-      if (!charName || charName === "") return; // Chỉ tính nếu đã chọn nhân vật
+      if (!charName || charName === "") return;
 
       const rawSpd = parseFloat(characterData[idx].spd);
       const spd = isNaN(rawSpd) || rawSpd <= 0 ? DEFAULT_SPD : rawSpd;
@@ -232,20 +234,82 @@ export default function HomeScreen() {
       const actionInterval = 10000 / spd;
       let accumulatedAv = actionInterval;
 
-      while (accumulatedAv <= totalAvLimit) {
-        allActions.push({
-          charIndex: idx,
-          name: charName,
-          av: accumulatedAv,
-        });
+      while (accumulatedAv <= upperAvLimit) {
+        if (accumulatedAv > lowerAvLimit) {
+          allActions.push({
+            charIndex: idx,
+            name: charName,
+            av: accumulatedAv,
+          });
+        }
         accumulatedAv += actionInterval;
       }
     });
 
     return allActions.sort((a, b) => a.av - b.av);
-  }, [characters, characterData, cycle]); // Tự động chạy lại khi các giá trị này đổi
+  }, [characters, characterData, cycle]);
 
-  const totalAvLimit = 150 + cycle * 100;
+  // 1. Logic tính toán Actions (Đã tối ưu để gom nhóm)
+  const timelineGroups = React.useMemo(() => {
+    const DEFAULT_SPD = 100;
+    const lowerAvLimit = cycle === 0 ? 0 : 150 + (cycle - 1) * 100;
+    const upperAvLimit = 150 + cycle * 100;
+    
+    let rawActions: { charIndex: number; name: string; av: number; image: any }[] = [];
+
+    // Lấy dữ liệu action thô
+    [1, 2, 3, 4].forEach((idx) => {
+      const charName = characters[idx - 1];
+      if (!charName || charName === "") return;
+
+      const rawSpd = parseFloat(characterData[idx].spd);
+      const spd = isNaN(rawSpd) || rawSpd <= 0 ? DEFAULT_SPD : rawSpd;
+      const actionInterval = 10000 / spd;
+      let accumulatedAv = actionInterval;
+
+      while (accumulatedAv <= upperAvLimit) {
+        if (accumulatedAv > lowerAvLimit) {
+          rawActions.push({
+            charIndex: idx,
+            name: charName,
+            av: accumulatedAv,
+            // Giả sử bạn lấy ảnh từ charactersData, ở đây mình tạm dùng require sample
+            image: require("../../assets/images/sample.png") 
+          });
+        }
+        accumulatedAv += actionInterval;
+      }
+    });
+
+    // Sort theo AV
+    rawActions.sort((a, b) => a.av - b.av);
+
+    // GOM NHÓM (CLUSTERING)
+    // Nếu 2 action cách nhau < 3 AV (hoặc % tùy ý), gộp chung vào 1 điểm hiển thị
+    const groups: { av: number; actions: typeof rawActions }[] = [];
+    const GROUP_THRESHOLD = 3; // Độ lệch AV cho phép để coi là "cùng lúc"
+
+    rawActions.forEach(action => {
+      const lastGroup = groups[groups.length - 1];
+      if (lastGroup && Math.abs(lastGroup.av - action.av) <= GROUP_THRESHOLD) {
+        // Gộp vào nhóm trước
+        lastGroup.actions.push(action);
+      } else {
+        // Tạo nhóm mới
+        groups.push({ av: action.av, actions: [action] });
+      }
+    });
+
+    return groups;
+  }, [characters, characterData, cycle]);
+
+  // Hàm tính vị trí % trên thanh ngang
+  const getPosition = (av: number) => {
+    const startAv = cycle === 0 ? 0 : 150 + (cycle - 1) * 100;
+    const endAv = 150 + cycle * 100;
+    const range = endAv - startAv;
+    return Math.max(0, Math.min(100, ((av - startAv) / range) * 100));
+  };
 
   return (
     <ImageBackground
@@ -488,70 +552,82 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* === TIMELINE === */}
-        <View className="mt-12 mb-20 items-center w-full px-8">
-          <View className="w-full h-[3px] bg-white/60 rounded-full relative items-center justify-center">
-            
-            {/* Vạch mốc khởi đầu */}
-            <View className="absolute left-0 w-[2px] h-4 bg-white" />
-            
-            {/* Vòng lặp hiển thị các điểm hành động */}
-            {actions.map((action, index) => {
-              const position = (action.av / totalAvLimit) * 100;
-              
-              // Kiểm tra xem có ai hành động cùng lúc (trùng AV) không
-              const isDuplicateAV = index > 0 && Math.abs(actions[index - 1].av - action.av) < 0.1;
-              if (isDuplicateAV) return null; // Bỏ qua lượt này vì sẽ hiển thị gộp ở lượt trước
+        {/* === TIMELINE CONTAINER (NO CHARACTER AV) === */}
+        <View className="flex-1 justify-center w-full px-8 my-12 z-0">
+          {/* Thanh ngang trục thời gian */}
+          <View className="w-full h-[4px] bg-white/30 rounded-full relative justify-center">
+            {/* Vạch đầu và cuối */}
+            <View className="absolute left-0 w-[2px] h-4 bg-white/50 -top-1.5" />
+            <View className="absolute right-0 w-[2px] h-4 bg-white/50 -top-1.5" />
 
-              // Tìm tất cả nhân vật tại mốc AV này
-              const charsAtThisPoint = actions.filter(a => Math.abs(a.av - action.av) < 0.1);
+            {timelineGroups.map((group, groupIndex) => {
+              const position = getPosition(group.av);
               
+              // Chia actions thành 2 nửa: Trên và Dưới để cân bằng
+              const topActions = group.actions.filter((_, i) => i % 2 === 0);
+              const bottomActions = group.actions.filter((_, i) => i % 2 !== 0);
+
               return (
-                <View 
-                  key={`point-${index}`} 
-                  className="absolute items-center" 
-                  style={{ left: `${position}%` }}
+                <View
+                  key={`group-${groupIndex}`}
+                  className="absolute items-center w-10"
+                  style={{ 
+                    left: `${position}%`, 
+                    transform: [{ translateX: -20 }] // Căn giữa điểm mốc
+                  }}
                 >
-                  {/* Điểm chấm trên thanh */}
-                  <View className="w-3 h-3 bg-yellow-400 rounded-full border-2 border-[#59659A] z-10" />
-
-                  {/* Render các nhân vật tại điểm này */}
-                  {charsAtThisPoint.map((char, charIdx) => {
-                    // Logic: 2 người đầu ở trên, người thứ 3-4 ở dưới
-                    const isTop = charIdx < 2; 
-                    const offset = isTop ? -45 - (charIdx * 35) : 15 + ((charIdx - 2) * 35);
-
-                    return (
-                      <View 
-                        key={`char-${char.charIndex}-${charIdx}`}
-                        className="absolute items-center w-12"
-                        style={{ top: offset }}
-                      >
-                        <View className="bg-[#c7c29b] w-10 h-10 rounded-full items-center justify-center border-2 border-white shadow-sm overflow-hidden">
+                  {/* --- PHẦN TRÊN (UPPER STACK) --- */}
+                  <View className="flex-col-reverse items-center mb-1">
+                    {/* Line nối từ trục lên nhân vật đầu tiên */}
+                    {topActions.length > 0 && <View className="w-[1px] h-3 bg-white/60" />}
+                    
+                    {topActions.map((action, i) => (
+                      <View key={`top-${i}`} className="items-center mb-1">
+                        <View className="w-9 h-9 bg-[#c7c29b] rounded-full items-center justify-center border border-white shadow-sm overflow-hidden z-10">
+                          {/* Nếu có ảnh thật thì dùng Image, ở đây dùng Text demo */}
                           <Text className="text-[10px] font-bold text-[#59659A]">
-                            {char.name.split(' ').map(n => n[0]).join('')}
+                            {action.name.substring(0, 2).toUpperCase()}
                           </Text>
                         </View>
-                        {/* Chỉ hiện AV ở icon gần thanh nhất để tránh rối */}
-                        {(charIdx === 0 || charIdx === 2) && (
-                          <Text className="text-white text-[8px] font-bold mt-1 bg-black/30 px-1 rounded">
-                            {Math.round(char.av)}
-                          </Text>
-                        )}
+                        {/* Đã xóa phần hiển thị AV ở đây */}
                       </View>
-                    );
-                  })}
+                    ))}
+                  </View>
+
+                  {/* --- ĐIỂM GIỮA (CENTER DOT) --- */}
+                  <View className="w-3 h-3 bg-yellow-400 rounded-full border-2 border-[#59659A] z-20" />
+
+                  {/* --- PHẦN DƯỚI (LOWER STACK) --- */}
+                  <View className="flex-col items-center mt-1">
+                    {/* Line nối từ trục xuống nhân vật đầu tiên */}
+                    {bottomActions.length > 0 && <View className="w-[1px] h-3 bg-white/60" />}
+
+                    {bottomActions.map((action, i) => (
+                      <View key={`bottom-${i}`} className="items-center mt-1">
+                        <View className="w-9 h-9 bg-[#c7c29b] rounded-full items-center justify-center border border-white shadow-sm overflow-hidden z-10">
+                           <Text className="text-[10px] font-bold text-[#59659A]">
+                            {action.name.substring(0, 2).toUpperCase()}
+                          </Text>
+                        </View>
+                        {/* Đã xóa phần hiển thị AV ở đây */}
+                      </View>
+                    ))}
+                  </View>
                 </View>
               );
             })}
-
-            {/* Vạch mốc kết thúc */}
-            <View className="absolute right-0 w-[2px] h-4 bg-white" />
           </View>
           
-          <View className="flex-row justify-between w-full mt-2">
-            <Text className="text-white/50 text-[10px]">0 AV</Text>
-            <Text className="text-white/50 text-[10px]">{totalAvLimit} AV (Max)</Text>
+          {/* Labels Start/End - Giữ lại để biết tổng quan cycle */}
+          <View className="flex-row justify-between w-full mt-16">
+            <View className="items-start">
+               <Text className="text-white/40 text-[10px] font-bold">START</Text>
+               <Text className="text-white/70 text-[11px]">{cycle === 0 ? 0 : 150 + (cycle - 1) * 100}</Text>
+            </View>
+            <View className="items-end">
+               <Text className="text-white/40 text-[10px] font-bold">CYCLE {cycle} END</Text>
+               <Text className="text-white/70 text-[11px]">{150 + cycle * 100}</Text>
+            </View>
           </View>
         </View>
 
@@ -610,6 +686,7 @@ export default function HomeScreen() {
             </View>
           </View>
         </View>
+
       </View>
 
     {openSelectTab && (
