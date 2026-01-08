@@ -42,7 +42,7 @@ export default function HomeScreen() {
     { id: 15, name: "Herta", image: require("../../assets/images/Characters/Herta.png") },
     { id: 16, name: "Himeko", image: require("../../assets/images/Characters/Himeko.png") },
     { id: 17, name: "Hook", image: require("../../assets/images/Characters/Hook.png") },
-    { id: 18, name: "Huohuo", image: require("../../assets/images/Characters/Huohuo.png") },
+    { id: 18, name: "Huohuo", image: require("../../assets/images/Characters/HuoHuo.png") },
     { id: 19, name: "Jing Yuan", image: require("../../assets/images/Characters/JingYuan.png") },
     { id: 20, name: "Jingliu", image: require("../../assets/images/Characters/JingLiu.png") },
     { id: 21, name: "Kafka", image: require("../../assets/images/Characters/Kafka.png") },
@@ -329,8 +329,8 @@ export default function HomeScreen() {
           }}
         >
           {/* TOP SECTION */}
-          <View 
-            className="flex-row items-center overflow-hidden bg-[#7B8BA6] relative" 
+          <View
+            className="flex-row items-center overflow-hidden bg-[#7B8BA6] relative"
             style={{
               borderTopLeftRadius: 16,
               borderTopRightRadius: 16,
@@ -351,33 +351,46 @@ export default function HomeScreen() {
               />
             )}
 
-            {[1, 2, 3, 4].map((i) => (
-              <View
-                key={i}
-                className="flex-1 items-center justify-center py-3"
-                onLayout={(event) => {
-                  const width = event.nativeEvent.layout.width;
-                  if (width !== columnWidth) setColumnWidth(width);
-                }}
-              >
-                <TouchableOpacity
-                  testID={`character-slot-${i}`}
-                  className="w-14 h-14 rounded-full bg-white items-center justify-center"
-                  onPress={() => handlePress(i)}
-                >
-                  {characters[i - 1] ? (
-                    <Text className="text-[#59659A] text-base">{characters[i - 1]}</Text>
-                  ) : (
-                    <Image
-                      source={require("../../assets/images/sample.png")}
-                      className="w-8 h-8"
-                      resizeMode="contain"
-                    />
-                  )}
-                </TouchableOpacity>
-              </View>
-            ))}
+            {[1, 2, 3, 4].map((i) => {
+              // 1. Lấy tên nhân vật tại vị trí i
+              const charName = characters[i - 1];
+              
+              // 2. Tìm object nhân vật tương ứng trong mảng charactersData để lấy ảnh
+              const foundChar = charactersData.find((c) => c.name === charName);
 
+              return (
+                <View
+                  key={i}
+                  className="flex-1 items-center justify-center py-3"
+                  onLayout={(event) => {
+                    const width = event.nativeEvent.layout.width;
+                    if (width !== columnWidth) setColumnWidth(width);
+                  }}
+                >
+                  <TouchableOpacity
+                    testID={`character-slot-${i}`}
+                    className="w-14 h-14 rounded-full bg-white items-center justify-center overflow-hidden" // Thêm overflow-hidden để ảnh bo tròn theo nút
+                    onPress={() => handlePress(i)}
+                  >
+                    {foundChar ? (
+                      // TRƯỜNG HỢP CÓ NHÂN VẬT: HIỆN ẢNH TỪ DATA
+                      <Image
+                        source={foundChar.image}
+                        className="w-full h-full" 
+                        resizeMode="cover" // Dùng cover để ảnh lấp đầy hình tròn
+                      />
+                    ) : (
+                      // TRƯỜNG HỢP CHƯA CHỌN: HIỆN ẢNH SAMPLE (DẤU CỘNG HOẶC MẶC ĐỊNH)
+                      <Image
+                        source={require("../../assets/images/sample.png")}
+                        className="w-8 h-8"
+                        resizeMode="contain"
+                      />
+                    )}
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
           </View>
 
           {/* === Eidolons === */}
@@ -470,7 +483,13 @@ export default function HomeScreen() {
                 className="bg-[#c7c29b] rounded-xl flex-row items-center px-3 py-2 flex-1 mr-2"
               >
                 <Image source={require("../../assets/images/sample.png")} className="w-6 h-6 mr-2 rounded-full" />
-                <Text className="font-medium">{characterData[currentChar].relic1 || "Relic 1"}</Text>
+                <Text 
+                  className="font-medium flex-1" 
+                  numberOfLines={1} 
+                  ellipsizeMode="tail"
+                >
+                  {characterData[currentChar].relic1 || "Relic 1"}
+                </Text>
               </TouchableOpacity>
 
               {/* Relic 2 */}
@@ -488,14 +507,17 @@ export default function HomeScreen() {
                     characterData[currentChar].relicSet === "Set 4" ? "opacity-50" : "opacity-100"
                   }`}
                 />
-                <Text className={`${characterData[currentChar].relicSet === "Set 4" ? "font-medium/50" : "font-medium"}`}>
+                <Text 
+                  className={`${characterData[currentChar].relicSet === "Set 4" ? "font-medium/50" : "font-medium"} flex-1`}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
                   {characterData[currentChar].relic2 || "Relic 2"}
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          
           {/* === Planar Set === */}
           <View className="flex-col px-3">
             <Text className="text-white text-lg mt-3 mb-1">Planar Sets:</Text>
@@ -539,87 +561,123 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Buttons */}
-        <View className="flex-col px-3 mt-5">
+      <View className="flex-1 justify-between w-full pb-8"> 
+        
+        {/* === 1. BUTTONS === */}
+        <View className="flex-col px-3 mt-5 mb-12">
           <View className="flex-row justify-between">
-            <TouchableOpacity className="px-6 py-2 bg-[#c7c29b] rounded-xl flex-row items-center" onPress={() => router.replace("/home/layout")}>
+            <TouchableOpacity 
+              className="px-6 py-2 bg-[#c7c29b] rounded-xl flex-row items-center" 
+              onPress={() => router.replace("/home/layout")}
+            >
               <Text className="font-medium text-lg mr-2">Preset</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity className="px-8 py-2 bg-[#c7c29b] rounded-xl" onPress={() => router.replace("/home/save")}>
+            <TouchableOpacity 
+              className="px-8 py-2 bg-[#c7c29b] rounded-xl" 
+              onPress={() => router.replace("/home/save")}
+            >
               <Text className="font-medium text-lg">Save</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* === TIMELINE CONTAINER (NO CHARACTER AV) === */}
-        <View className="flex-1 justify-center w-full px-8 my-12 z-0">
-          {/* Thanh ngang trục thời gian */}
-          <View className="w-full h-[4px] bg-white/30 rounded-full relative justify-center">
-            {/* Vạch đầu và cuối */}
+        {/* === 2. TIMELINE CONTAINER === */}
+        {/* Container chính: Cần đủ chiều cao để chứa các stack nhân vật. 
+            Ta dùng h-[300px] hoặc một chiều cao cố định để đảm bảo không gian. 
+        */}
+        <View className="w-full h-[320px] justify-center relative px-8 z-0 mt-4">
+          
+          {/* --- TRỤC THỜI GIAN (THE LINE) --- */}
+          {/* Được ghim cứng ở giữa (top-1/2) bằng absolute để không bị ảnh hưởng bởi layout con */}
+          <View className="absolute left-8 right-8 top-1/2 h-[4px] bg-white/30 rounded-full z-0">
+             {/* Vạch giới hạn 2 đầu */}
             <View className="absolute left-0 w-[2px] h-4 bg-white/50 -top-1.5" />
             <View className="absolute right-0 w-[2px] h-4 bg-white/50 -top-1.5" />
+          </View>
 
+          {/* --- CÁC ĐIỂM HÀNH ĐỘNG (ACTION GROUPS) --- */}
+          {/* Render đè lên trên trục thời gian */}
+          <View className="absolute left-8 right-8 top-1/2 h-0 z-10"> 
             {timelineGroups.map((group, groupIndex) => {
               const position = getPosition(group.av);
               
-              // Chia actions thành 2 nửa: Trên và Dưới để cân bằng
               const topActions = group.actions.filter((_, i) => i % 2 === 0);
               const bottomActions = group.actions.filter((_, i) => i % 2 !== 0);
 
               return (
                 <View
                   key={`group-${groupIndex}`}
-                  className="absolute items-center w-10"
+                  className="absolute items-center w-10 justify-center"
                   style={{ 
                     left: `${position}%`, 
-                    transform: [{ translateX: -20 }] // Căn giữa điểm mốc
+                    // Dịch sang trái 20px (nửa width 10) để tâm điểm trùng với % timeline
+                    transform: [{ translateX: -20 }] 
                   }}
                 >
-                  {/* --- PHẦN TRÊN (UPPER STACK) --- */}
-                  <View className="flex-col-reverse items-center mb-1">
-                    {/* Line nối từ trục lên nhân vật đầu tiên */}
-                    {topActions.length > 0 && <View className="w-[1px] h-3 bg-white/60" />}
+                  {/* --- ĐIỂM MỐC (DOT) --- */}
+                  {/* Luôn nằm chính giữa trục */}
+                  <View className="w-3 h-3 bg-yellow-400 rounded-full border-2 border-[#59659A] z-20 shadow-md shadow-black/50" />
+
+                  {/* --- STACK TRÊN (UPPER STACK) --- */}
+                  {/* Absolute + bottom: mọc ngược lên trên */}
+                  <View className="absolute bottom-5 items-center pb-1">
+                    {/* Đường nối */}
+                    {topActions.length > 0 && <View className="absolute bottom-[-4px] w-[2px] h-4 bg-white/50" />}
                     
-                    {topActions.map((action, i) => (
-                      <View key={`top-${i}`} className="items-center mb-1">
-                        <View className="w-9 h-9 bg-[#c7c29b] rounded-full items-center justify-center border border-white shadow-sm overflow-hidden z-10">
-                          {/* Nếu có ảnh thật thì dùng Image, ở đây dùng Text demo */}
-                          <Text className="text-[10px] font-bold text-[#59659A]">
-                            {action.name.substring(0, 2).toUpperCase()}
-                          </Text>
-                        </View>
-                        {/* Đã xóa phần hiển thị AV ở đây */}
-                      </View>
-                    ))}
+                    <View className="flex-col-reverse items-center gap-1">
+                      {topActions.map((action, i) => {
+                        const charImg = charactersData.find(c => c.name === action.name)?.image;
+                        return (
+                          <View key={`top-${i}`} className="items-center">
+                            <View className="w-10 h-10 bg-[#c7c29b] rounded-full items-center justify-center border-2 border-white/90 shadow-sm overflow-hidden z-10">
+                              {charImg ? (
+                                <Image source={charImg} className="w-full h-full" resizeMode="cover" />
+                              ) : (
+                                <Text className="text-[10px] font-bold text-[#59659A]">
+                                  {action.name.substring(0, 2).toUpperCase()}
+                                </Text>
+                              )}
+                            </View>
+                          </View>
+                        );
+                      })}
+                    </View>
                   </View>
 
-                  {/* --- ĐIỂM GIỮA (CENTER DOT) --- */}
-                  <View className="w-3 h-3 bg-yellow-400 rounded-full border-2 border-[#59659A] z-20" />
+                  {/* --- STACK DƯỚI (LOWER STACK) --- */}
+                  {/* Absolute + top: mọc xuôi xuống dưới */}
+                  <View className="absolute top-5 items-center pt-1">
+                    {/* Đường nối */}
+                    {bottomActions.length > 0 && <View className="absolute top-[-4px] w-[2px] h-4 bg-white/50" />}
 
-                  {/* --- PHẦN DƯỚI (LOWER STACK) --- */}
-                  <View className="flex-col items-center mt-1">
-                    {/* Line nối từ trục xuống nhân vật đầu tiên */}
-                    {bottomActions.length > 0 && <View className="w-[1px] h-3 bg-white/60" />}
-
-                    {bottomActions.map((action, i) => (
-                      <View key={`bottom-${i}`} className="items-center mt-1">
-                        <View className="w-9 h-9 bg-[#c7c29b] rounded-full items-center justify-center border border-white shadow-sm overflow-hidden z-10">
-                           <Text className="text-[10px] font-bold text-[#59659A]">
-                            {action.name.substring(0, 2).toUpperCase()}
-                          </Text>
-                        </View>
-                        {/* Đã xóa phần hiển thị AV ở đây */}
-                      </View>
-                    ))}
+                    <View className="flex-col items-center gap-1">
+                      {bottomActions.map((action, i) => {
+                         const charImg = charactersData.find(c => c.name === action.name)?.image;
+                         return (
+                          <View key={`bottom-${i}`} className="items-center">
+                            <View className="w-10 h-10 bg-[#c7c29b] rounded-full items-center justify-center border-2 border-white/90 shadow-sm overflow-hidden z-10">
+                               {charImg ? (
+                                  <Image source={charImg} className="w-full h-full" resizeMode="cover" />
+                                ) : (
+                                  <Text className="text-[10px] font-bold text-[#59659A]">
+                                    {action.name.substring(0, 2).toUpperCase()}
+                                  </Text>
+                                )}
+                            </View>
+                          </View>
+                        );
+                      })}
+                    </View>
                   </View>
+
                 </View>
               );
             })}
           </View>
           
-          {/* Labels Start/End - Giữ lại để biết tổng quan cycle */}
-          <View className="flex-row justify-between w-full mt-16">
+          {/* Labels Start/End - Nằm tuyệt đối ở đáy container để không bị đẩy */}
+          <View className="absolute bottom-0 left-8 right-8 flex-row justify-between">
             <View className="items-start">
                <Text className="text-white/40 text-[10px] font-bold">START</Text>
                <Text className="text-white/70 text-[11px]">{cycle === 0 ? 0 : 150 + (cycle - 1) * 100}</Text>
@@ -629,12 +687,12 @@ export default function HomeScreen() {
                <Text className="text-white/70 text-[11px]">{150 + cycle * 100}</Text>
             </View>
           </View>
+
         </View>
 
-        {/* === CYCLE BOX === */}
-        <View className="absolute bottom-12 left-0 right-0 items-center">
+        {/* === 3. CYCLE BOX === */}
+        <View className="items-center">
           <View className="flex-row items-center justify-center bg-[#c7c29b] rounded-2xl px-6 py-1 w-[40%] ">
-            {/* Label + Cycle display / input */}
             {editingCycle ? (
               <View className="flex-row items-center">
                 <Text className="text-white font-semibold text-lg mr-2">Cycle:</Text>
@@ -669,7 +727,6 @@ export default function HomeScreen() {
               </TouchableOpacity>
             )}
 
-            {/* Up / Down buttons */}
             <View className="flex-col ml-4">
               <TouchableOpacity
                 onPress={() => setCycle(prev => prev + 1)}
@@ -688,6 +745,7 @@ export default function HomeScreen() {
         </View>
 
       </View>
+    </View>
 
     {openSelectTab && (
       <SelectTab
