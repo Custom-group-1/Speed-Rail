@@ -132,7 +132,7 @@ export default function HomeScreen() {
     { id: 5, name: "Fleet of the Ageless", image: require("../../assets/images/Planars/Fleet_of_the_Ageless.png") },
     { id: 6, name: "Inert Salsotto", image: require("../../assets/images/Planars/Inert_Salsotto.png") },
     { id: 7, name: "Pan-Cosmic Commercial Enterprise", image: require("../../assets/images/Planars/Pan-Cosmic_Commercial_Enterprise.png") },
-    { id: 8, name: "Penacony, Land of the Dreams", image: require("../../assets/images/Planars/Penacony_Land_of_the_Dreams.png") },
+    { id: 8, name: "Penacony Land of the Dreams", image: require("../../assets/images/Planars/Penacony_Land_of_the_Dreams.png") },
     { id: 9, name: "Rutilant Arena", image: require("../../assets/images/Planars/Rutilant_Arena.png") },
     { id: 10, name: "Space Sealing Station", image: require("../../assets/images/Planars/Space_Sealing_Station.png") },
     { id: 11, name: "Sprightly Vonwacq", image: require("../../assets/images/Planars/Sprightly_Vonwacq.png") },
