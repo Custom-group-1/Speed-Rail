@@ -21,7 +21,7 @@ export default function HomeScreen() {
   const [editingCycle, setEditingCycle] = useState(false);
   const [cycleInput, setCycleInput] = useState<string>(cycle.toString());
 
-  // ====================================================================
+   // ====================================================================
   // 1. CHARACTERS (Alphabetical Order for easier mapping)
   // ====================================================================
   const charactersData: SelectItem[] = [
@@ -96,7 +96,7 @@ export default function HomeScreen() {
     { id: 21, name: "Something Irreplaceable", image: require("../../assets/images/Lightcones/Something_Irreplaceable.png") },
     { id: 22, name: "The Unreachable Side", image: require("../../assets/images/Lightcones/The_Unreachable_Side.png") },
     { id: 23, name: "Time Waits for No One", image: require("../../assets/images/Lightcones/Time_Waits_for_No_One.png") },
-    { id: 24, name: "Today is Another Peaceful Day", image: require("../../assets/images/Lightcones/Today_is_Another_Peaceful_Day.png") },
+    { id: 24, name: "Today is Another Peaceful Day", image: require("../../assets/images/Lightcones/Today_Is_Another_Peaceful_Day.png") },
     { id: 25, name: "Under the Blue Sky", image: require("../../assets/images/Lightcones/Under_the_Blue_Sky.png") },
   ];
 
@@ -139,6 +139,7 @@ export default function HomeScreen() {
     { id: 12, name: "Talia: Kingdom of Banditry", image: require("../../assets/images/Planar/Talia_Kingdom_of_Banditry.png") },
   ];
 
+  // ====================================================================
   // ====================================================================
 
   const [characterData, setCharacterData] = useState<Record<number, {
@@ -565,111 +566,130 @@ export default function HomeScreen() {
         </View>
 
         {/* === 2. TIMELINE CONTAINER === */}
-        {/* Container chính: Cần đủ chiều cao để chứa các stack nhân vật. 
-            Ta dùng h-[300px] hoặc một chiều cao cố định để đảm bảo không gian. 
-        */}
-        <View className="w-full h-[320px] justify-center relative px-8 z-0 mt-4">
+        <View className="flex-1 justify-center items-center w-full px-8 z-0">
           
-          {/* --- TRỤC THỜI GIAN (THE LINE) --- */}
-          {/* Được ghim cứng ở giữa (top-1/2) bằng absolute để không bị ảnh hưởng bởi layout con */}
-          <View className="absolute left-8 right-8 top-1/2 h-[4px] bg-white/30 rounded-full z-0">
-             {/* Vạch giới hạn 2 đầu */}
+          {/* Thanh ngang (Trục chính) */}
+          <View className="w-full h-[4px] bg-white/30 rounded-full relative justify-center">
+            {/* Vạch giới hạn Start/End */}
             <View className="absolute left-0 w-[2px] h-4 bg-white/50 -top-1.5" />
             <View className="absolute right-0 w-[2px] h-4 bg-white/50 -top-1.5" />
-          </View>
 
-          {/* --- CÁC ĐIỂM HÀNH ĐỘNG (ACTION GROUPS) --- */}
-          {/* Render đè lên trên trục thời gian */}
-          <View className="absolute left-8 right-8 top-1/2 h-0 z-10"> 
+            {/* Loop qua các Group (Cụm nhân vật cùng AV) */}
             {timelineGroups.map((group, groupIndex) => {
               const position = getPosition(group.av);
-              
-              const topActions = group.actions.filter((_, i) => i % 2 === 0);
-              const bottomActions = group.actions.filter((_, i) => i % 2 !== 0);
+              const count = group.actions.length;
 
               return (
                 <View
                   key={`group-${groupIndex}`}
-                  className="absolute items-center w-10 justify-center"
-                  style={{ 
-                    left: `${position}%`, 
-                    // Dịch sang trái 20px (nửa width 10) để tâm điểm trùng với % timeline
-                    transform: [{ translateX: -20 }] 
+                  className="absolute items-center justify-center w-10"
+                  style={{
+                    left: `${position}%`,
+                    marginLeft: -20, // Căn giữa chính xác (w-10 = 40px -> -20px)
+                    top: 0,
+                    bottom: 0,
                   }}
                 >
-                  {/* --- ĐIỂM MỐC (DOT) --- */}
-                  {/* Luôn nằm chính giữa trục */}
-                  <View className="w-3 h-3 bg-yellow-400 rounded-full border-2 border-[#59659A] z-20 shadow-md shadow-black/50" />
+                  {/* 1. CHẤM VÀNG (LUÔN CỐ ĐỊNH Ở TÂM) */}
+                  <View className="w-3 h-3 bg-yellow-400 rounded-full border-2 border-[#59659A] z-20 shadow-sm" />
 
-                  {/* --- STACK TRÊN (UPPER STACK) --- */}
-                  {/* Absolute + bottom: mọc ngược lên trên */}
-                  <View className="absolute bottom-5 items-center pb-1">
-                    {/* Đường nối */}
-                    {topActions.length > 0 && <View className="absolute bottom-[-4px] w-[2px] h-4 bg-white/50" />}
-                    
-                    <View className="flex-col-reverse items-center gap-1">
-                      {topActions.map((action, i) => {
-                        const charImg = charactersData.find(c => c.name === action.name)?.image;
-                        return (
-                          <View key={`top-${i}`} className="items-center">
-                            <View className="w-10 h-10 bg-[#c7c29b] rounded-full items-center justify-center border-2 border-white/90 shadow-sm overflow-hidden z-10">
-                              {charImg ? (
-                                <Image source={charImg} className="w-full h-full" resizeMode="cover" />
-                              ) : (
-                                <Text className="text-[10px] font-bold text-[#59659A]">
-                                  {action.name.substring(0, 2).toUpperCase()}
-                                </Text>
-                              )}
-                            </View>
+                  {/* 2. CÁC NHÂN VẬT TỎA RA TỪ TÂM */}
+                  {group.actions.map((action, actionIdx) => {
+                    // --- LOGIC XẾP VỊ TRÍ ---
+                    let isTop = true;
+                    let level = 0;
+
+                    if (count === 1) {
+                      // Nếu chỉ 1 người -> Luôn nằm trên
+                      isTop = true;
+                      level = 0;
+                    } else {
+                      // So le: Chẵn lên trên, Lẻ xuống dưới
+                      isTop = actionIdx % 2 === 0;
+                      level = Math.floor(actionIdx / 2);
+                    }
+
+                    // Khoảng cách từ tâm chấm vàng đến tâm Avatar
+                    const baseDistance = 28; // Khoảng cách tầng 1 (gần nhất)
+                    const gap = 42;          // Khoảng cách giữa các tầng
+                    const distance = baseDistance + (level * gap);
+
+                    // Logic hiển thị số AV (chỉ hiện cho người ngoài cùng cho đỡ rối)
+                    const showAvText = count === 1 || actionIdx >= count - 2;
+
+                    // Tìm ảnh nhân vật
+                    const charImg = charactersData.find(c => c.name === action.name)?.image;
+
+                    return (
+                      <View
+                        key={`char-${actionIdx}`}
+                        className="absolute items-center justify-center w-10"
+                        style={{
+                          height: distance, // Chiều cao view bằng đúng khoảng cách để vẽ đường nối
+                          // Nếu ở trên: neo đáy vào tâm (bottom: 50%)
+                          // Nếu ở dưới: neo đỉnh vào tâm (top: 50%)
+                          bottom: isTop ? "50%" : "auto",
+                          top: isTop ? "auto" : "50%",
+                        }}
+                      >
+                        {/* Dây nối (Stem) */}
+                        <View className="absolute w-[1px] bg-white/60 h-full" />
+
+                        {/* Avatar Box (Luôn nằm ở đầu mút xa nhất của dây nối) */}
+                        <View 
+                          className="absolute items-center justify-center"
+                          style={{ 
+                            // Nếu là top thì Avatar nằm ở đỉnh (top: 0), nếu bottom thì nằm ở đáy
+                            top: isTop ? 0 : "auto", 
+                            bottom: isTop ? "auto" : 0,
+                            transform: [{ translateY: isTop ? -16 : 16 }] // Dịch ra khỏi đầu dây một chút để không đè
+                          }}
+                        >
+                          {/* Vòng tròn Avatar */}
+                          <View className="w-9 h-9 bg-[#c7c29b] rounded-full items-center justify-center border border-white shadow-sm overflow-hidden z-30">
+                            {charImg ? (
+                              <Image source={charImg} className="w-full h-full" resizeMode="cover" />
+                            ) : (
+                              <Text className="text-[10px] font-bold text-[#59659A]">
+                                {action.name.substring(0, 2).toUpperCase()}
+                              </Text>
+                            )}
                           </View>
-                        );
-                      })}
-                    </View>
-                  </View>
 
-                  {/* --- STACK DƯỚI (LOWER STACK) --- */}
-                  {/* Absolute + top: mọc xuôi xuống dưới */}
-                  <View className="absolute top-5 items-center pt-1">
-                    {/* Đường nối */}
-                    {bottomActions.length > 0 && <View className="absolute top-[-4px] w-[2px] h-4 bg-white/50" />}
-
-                    <View className="flex-col items-center gap-1">
-                      {bottomActions.map((action, i) => {
-                         const charImg = charactersData.find(c => c.name === action.name)?.image;
-                         return (
-                          <View key={`bottom-${i}`} className="items-center">
-                            <View className="w-10 h-10 bg-[#c7c29b] rounded-full items-center justify-center border-2 border-white/90 shadow-sm overflow-hidden z-10">
-                               {charImg ? (
-                                  <Image source={charImg} className="w-full h-full" resizeMode="cover" />
-                                ) : (
-                                  <Text className="text-[10px] font-bold text-[#59659A]">
-                                    {action.name.substring(0, 2).toUpperCase()}
-                                  </Text>
-                                )}
+                          {/* Số AV (Badge) */}
+                          {showAvText && (
+                            <View
+                              className={`absolute items-center min-w-[24px] z-40 ${
+                                isTop ? "top-[-14px]" : "bottom-[-14px]"
+                              }`}
+                            >
+                              <Text className="text-yellow-200 text-[9px] font-bold bg-[#59659A]/90 px-1.5 py-0.5 rounded text-center overflow-hidden">
+                                {Math.round(group.av)}
+                              </Text>
                             </View>
-                          </View>
-                        );
-                      })}
-                    </View>
-                  </View>
-
+                          )}
+                        </View>
+                      </View>
+                    );
+                  })}
                 </View>
               );
             })}
           </View>
-          
-          {/* Labels Start/End - Nằm tuyệt đối ở đáy container để không bị đẩy */}
-          <View className="absolute bottom-0 left-8 right-8 flex-row justify-between">
+
+          {/* Text Start/End Cycle */}
+          <View className="flex-row justify-between w-full mt-24">
             <View className="items-start">
-               <Text className="text-white/40 text-[10px] font-bold">START</Text>
-               <Text className="text-white/70 text-[11px]">{cycle === 0 ? 0 : 150 + (cycle - 1) * 100}</Text>
+              <Text className="text-white/40 text-[10px] font-bold">START</Text>
+              <Text className="text-white/70 text-[11px]">
+                {cycle === 0 ? 0 : 150 + (cycle - 1) * 100}
+              </Text>
             </View>
             <View className="items-end">
-               <Text className="text-white/40 text-[10px] font-bold">CYCLE {cycle} END</Text>
-               <Text className="text-white/70 text-[11px]">{150 + cycle * 100}</Text>
+              <Text className="text-white/40 text-[10px] font-bold">CYCLE {cycle} END</Text>
+              <Text className="text-white/70 text-[11px]">{150 + cycle * 100}</Text>
             </View>
           </View>
-
         </View>
 
         {/* === 3. CYCLE BOX === */}
