@@ -8,19 +8,19 @@ const steps = [
     title: "Dự đoán lượt đi,\nlàm chủ trận đấu!",
     description:
       "Speed Rail giúp bạn dự đoán chính xác và trực quan lượt đi của mọi nhân vật, chấm dứt việc đoán mò thứ tự hành động.",
-    image: require("../../assets/images/onboard.webp"),
+    image: require("../../assets/images/onboard.png"),
   },
   {
     title: "Mô phỏng lượt đi \nTỐC ĐỘ CAO",
     description:
       "Chỉ cần nhập Tốc độ, Speed Rail sẽ tự động trực quan hóa thứ tự hành động trên thanh, mô phỏng ảnh hưởng tăng/giảm tốc, giúp bạn tối ưu hóa đội hình một cách nhanh chóng.",
-    image: require("../../assets/images/onboard.webp"),
+    image: require("../../assets/images/onboard.png"),
   },
   {
     title: "Cực kỳ hiệu quả \nvà vượt trội!",
     description:
       "Tất cả gói gọn trong một: Nhập liệu, mô phỏng tức thì, lưu đội hình và thiết kế di động giúp việc tối ưu tốc độ chưa bao giờ dễ dàng đến thế!",
-    image: require("../../assets/images/onboard.webp"),
+    image: require("../../assets/images/onboard.png"),
   },
 ];
 
