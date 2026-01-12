@@ -1,12 +1,14 @@
 import { useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
-import { Animated, Image, ImageBackground, Text, TextInput, TouchableOpacity, View } from "react-native";
+import React, { useRef, useState, useEffect } from "react";
+import { Animated, Image, ImageBackground, Text, TextInput, TouchableOpacity, View, ActivityIndicator } from "react-native";
 import Dropdown from "../../components/Dropdown";
 import SelectTab, { SelectItem } from "../../components/SelectTab";
-
+import { useGameData } from "../../utils/useGameData";
+import { Character } from "../../utils/api";
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { characters: apiCharacters, lightcones, relicSets, loading, error, getCharacterById } = useGameData();
   
   const [currentChar, setCurrentChar] = useState(1);
   const [characters, setCharacters] = useState<string[]>(["", "", "", ""]);
@@ -21,52 +23,50 @@ export default function HomeScreen() {
   const [editingCycle, setEditingCycle] = useState(false);
   const [cycleInput, setCycleInput] = useState<string>(cycle.toString());
 
-   // ====================================================================
-  // 1. CHARACTERS (Alphabetical Order for easier mapping)
+  // ====================================================================
+  // 1. CHARACTERS (Match database order from populate.txt)
   // ====================================================================
   const charactersData: SelectItem[] = [
-    { id: 1, name: "Argenti", image: require("../../assets/images/Characters/Argenti.png") },
-    { id: 2, name: "Arlan", image: require("../../assets/images/Characters/Arlan.png") },
-    { id: 3, name: "Asta", image: require("../../assets/images/Characters/Asta.png") },
-    { id: 4, name: "Bailu", image: require("../../assets/images/Characters/Bailu.png") },
-    { id: 5, name: "Blade", image: require("../../assets/images/Characters/Blade.png") },
-    { id: 6, name: "Bronya", image: require("../../assets/images/Characters/Bronya.png") },
-    { id: 7, name: "Clara", image: require("../../assets/images/Characters/Clara.png") },
-    { id: 8, name: "Dan Heng", image: require("../../assets/images/Characters/DanHeng.png") },
-    { id: 9, name: "Dan Heng • Imbibitor Lunae", image: require("../../assets/images/Characters/DHIL.png") },
-    { id: 10, name: "Dr. Ratio", image: require("../../assets/images/Characters/DrRatio.png") },
-    { id: 11, name: "Fu Xuan", image: require("../../assets/images/Characters/FuXuan.png") },
-    { id: 12, name: "Gepard", image: require("../../assets/images/Characters/Gepard.png") },
-    { id: 13, name: "Guinaifen", image: require("../../assets/images/Characters/Guinaifen.png") },
-    { id: 14, name: "Hanya", image: require("../../assets/images/Characters/Hanya.png") },
-    { id: 15, name: "Herta", image: require("../../assets/images/Characters/Herta.png") },
-    { id: 16, name: "Himeko", image: require("../../assets/images/Characters/Himeko.png") },
-    { id: 17, name: "Hook", image: require("../../assets/images/Characters/Hook.png") },
+    { id: 1, name: "Himeko", image: require("../../assets/images/Characters/Himeko.png") },
+    { id: 2, name: "Welt", image: require("../../assets/images/Characters/Welt.png") },
+    { id: 3, name: "Bronya", image: require("../../assets/images/Characters/Bronya.png") },
+    { id: 4, name: "Gepard", image: require("../../assets/images/Characters/Gepard.png") },
+    { id: 5, name: "Clara", image: require("../../assets/images/Characters/Clara.png") },
+    { id: 6, name: "Yanqing", image: require("../../assets/images/Characters/Yanqing.png") },
+    { id: 7, name: "Bailu", image: require("../../assets/images/Characters/Bailu.png") },
+    { id: 8, name: "Seele", image: require("../../assets/images/Characters/Seele.png") },
+    { id: 9, name: "Jing Yuan", image: require("../../assets/images/Characters/JingYuan.png") },
+    { id: 10, name: "Silver Wolf", image: require("../../assets/images/Characters/SilverWolf.png") },
+    { id: 11, name: "Luocha", image: require("../../assets/images/Characters/Luocha.png") },
+    { id: 12, name: "Blade", image: require("../../assets/images/Characters/Blade.png") },
+    { id: 13, name: "Kafka", image: require("../../assets/images/Characters/Kafka.png") },
+    { id: 14, name: "Dan Heng • Imbibitor Lunae", image: require("../../assets/images/Characters/DHIL.png") },
+    { id: 15, name: "Fu Xuan", image: require("../../assets/images/Characters/FuXuan.png") },
+    { id: 16, name: "Jingliu", image: require("../../assets/images/Characters/JingLiu.png") },
+    { id: 17, name: "Topaz & Numby", image: require("../../assets/images/Characters/Topaz.png") },
     { id: 18, name: "Huohuo", image: require("../../assets/images/Characters/HuoHuo.png") },
-    { id: 19, name: "Jing Yuan", image: require("../../assets/images/Characters/JingYuan.png") },
-    { id: 20, name: "Jingliu", image: require("../../assets/images/Characters/JingLiu.png") },
-    { id: 21, name: "Kafka", image: require("../../assets/images/Characters/Kafka.png") },
-    { id: 22, name: "Luka", image: require("../../assets/images/Characters/Luka.png") },
-    { id: 23, name: "Luocha", image: require("../../assets/images/Characters/Luocha.png") },
-    { id: 24, name: "Lynx", image: require("../../assets/images/Characters/Lynx.png") },
-    { id: 25, name: "March 7th", image: require("../../assets/images/Characters/March7th.png") },
-    { id: 26, name: "Natasha", image: require("../../assets/images/Characters/Natasha.png") },
-    { id: 27, name: "Pela", image: require("../../assets/images/Characters/Pela.png") },
-    { id: 28, name: "Qingque", image: require("../../assets/images/Characters/Qingque.png") },
-    { id: 29, name: "Ruan Mei", image: require("../../assets/images/Characters/RuanMei.png") },
-    { id: 30, name: "Sampo", image: require("../../assets/images/Characters/Sampo.png") },
-    { id: 31, name: "Seele", image: require("../../assets/images/Characters/Seele.png") },
-    { id: 32, name: "Serval", image: require("../../assets/images/Characters/Serval.png") },
-    { id: 33, name: "Silver Wolf", image: require("../../assets/images/Characters/SilverWolf.png") },
-    { id: 34, name: "Sushang", image: require("../../assets/images/Characters/Sushang.png") },
-    { id: 35, name: "Tingyun", image: require("../../assets/images/Characters/Tingyun.png") },
-    { id: 36, name: "Topaz & Numby", image: require("../../assets/images/Characters/Topaz.png") },
-    { id: 37, name: "Welt", image: require("../../assets/images/Characters/Welt.png") },
-    { id: 38, name: "Xueyi", image: require("../../assets/images/Characters/Xueyi.png") },
-    { id: 39, name: "Yanqing", image: require("../../assets/images/Characters/Yanqing.png") },
-    { id: 40, name: "Yukong", image: require("../../assets/images/Characters/Yukong.png") },
-    { id: 41, name: "Trailblazer (Physical)", image: require("../../assets/images/Characters/Trailblazer(Physical).png") },
-    { id: 42, name: "Trailblazer (Preservation)", image: require("../../assets/images/Characters/Trailblazer(Preservation).png") },
+    { id: 19, name: "Argenti", image: require("../../assets/images/Characters/Argenti.png") },
+    { id: 20, name: "Ruan Mei", image: require("../../assets/images/Characters/RuanMei.png") },
+    { id: 21, name: "Dr. Ratio", image: require("../../assets/images/Characters/DrRatio.png") },
+    { id: 22, name: "Tingyun", image: require("../../assets/images/Characters/Tingyun.png") },
+    { id: 23, name: "Asta", image: require("../../assets/images/Characters/Asta.png") },
+    { id: 24, name: "Pela", image: require("../../assets/images/Characters/Pela.png") },
+    { id: 25, name: "Yukong", image: require("../../assets/images/Characters/Yukong.png") },
+    { id: 26, name: "Hanya", image: require("../../assets/images/Characters/Hanya.png") },
+    { id: 27, name: "Sushang", image: require("../../assets/images/Characters/Sushang.png") },
+    { id: 28, name: "Dan Heng", image: require("../../assets/images/Characters/DanHeng.png") },
+    { id: 29, name: "March 7th", image: require("../../assets/images/Characters/March7th.png") },
+    { id: 30, name: "Natasha", image: require("../../assets/images/Characters/Natasha.png") },
+    { id: 31, name: "Lynx", image: require("../../assets/images/Characters/Lynx.png") },
+    { id: 32, name: "Qingque", image: require("../../assets/images/Characters/Qingque.png") },
+    { id: 33, name: "Sampo", image: require("../../assets/images/Characters/Sampo.png") },
+    { id: 34, name: "Serval", image: require("../../assets/images/Characters/Serval.png") },
+    { id: 35, name: "Herta", image: require("../../assets/images/Characters/Herta.png") },
+    { id: 36, name: "Hook", image: require("../../assets/images/Characters/Hook.png") },
+    { id: 37, name: "Arlan", image: require("../../assets/images/Characters/Arlan.png") },
+    { id: 38, name: "Luka", image: require("../../assets/images/Characters/Luka.png") },
+    { id: 39, name: "Guinaifen", image: require("../../assets/images/Characters/Guinaifen.png") },
+    { id: 40, name: "Xueyi", image: require("../../assets/images/Characters/Xueyi.png") },
   ];
 
   // ====================================================================
@@ -140,6 +140,41 @@ export default function HomeScreen() {
   ];
 
   // ====================================================================
+  // Convert API data to SelectItem format for UI dropdowns
+  // Map to correct images from charactersData by name
+  // ====================================================================
+  const charactersSelectData: SelectItem[] = apiCharacters.map(char => {
+    // Find the character in our local data to get the correct image
+    const localChar = charactersData.find(c => c.name === char.name);
+    return {
+      id: char.id,
+      name: char.name,
+      image: localChar?.image || require("../../assets/images/Characters/Argenti.png"), // Use correct image or fallback
+    };
+  });
+
+  const lightconesSelectData: SelectItem[] = lightcones.map(lc => {
+    // Find lightcone in local data by name
+    const localLc = lightconesData.find(l => l.name === lc.name);
+    return {
+      id: lc.id,
+      name: lc.name,
+      image: localLc?.image || require("../../assets/images/Lightcones/A_Secret_Vow.png"), // Use correct image or fallback
+    };
+  });
+
+  const relicsSelectData: SelectItem[] = relicSets.map(rs => {
+    // Find relic set in local data by name
+    const localRelic = relicSetData.find(r => r.name === rs.name);
+    return {
+      id: rs.id,
+      name: rs.name,
+      image: localRelic?.image || require("../../assets/images/Relic Sets/Band_of_Sizzling_Thunder.png"), // Use correct image or fallback
+    };
+  });
+
+  const planarsSelectData: SelectItem[] = []; // Planars endpoint not created yet
+
   // ====================================================================
 
   const [characterData, setCharacterData] = useState<Record<number, {
@@ -179,14 +214,29 @@ export default function HomeScreen() {
   };
 
   const handleChoose = (item: SelectItem, context: "characters" | "lightcones" | "relicSet" | "planarSet") => {
-    // 1. Cập nhật mảng characters (Dùng cho vòng tròn phía trên và Timeline)
+    // When selecting a character, fetch its base speed from API
     if (context === "characters") {
-      const newChars = [...characters]; // Clone mảng cũ
+      const newChars = [...characters];
       newChars[currentChar - 1] = item.name;
       setCharacters(newChars);
+
+      // Fetch character speed from backend API
+      getCharacterById(item.id).then(charDetail => {
+        if (charDetail) {
+          setCharacterData(prev => ({
+            ...prev,
+            [currentChar]: {
+              ...prev[currentChar],
+              spd: charDetail.baseSpeed.toString(),
+            }
+          }));
+        }
+      }).catch(err => {
+        console.warn(`Failed to fetch speed for character ${item.id}:`, err);
+      });
     }
 
-    // 2. Cập nhật object characterData (Dùng cho các nút bấm bên dưới)
+    // Update other character data
     setCharacterData(prev => ({
       ...prev,
       [currentChar]: {
@@ -521,26 +571,66 @@ export default function HomeScreen() {
           <View className="flex-col px-3" style={{paddingBottom: 12}}>
             <Text className="text-white text-lg mt-3 mb-1">Speed Input:</Text>
 
-            <TextInput
-              className="bg-[#c7c29b] h-10 rounded-xl px-4 text-black text-left"
-              placeholder="Nhập số..."
-              placeholderTextColor="#555"
-              keyboardType="numeric"
-              value={characterData[currentChar].spd}
-              onFocus={() => {
-                setOpenDropdown(null);      // đóng dropdown
-                setOpenSelectTab(null);     // đóng select tab
-              }}
-              onChangeText={(val) =>
-                setCharacterData({
-                  ...characterData,
-                  [currentChar]: {
-                    ...characterData[currentChar],
-                    spd: val,
-                  },
-                })
-              }
-            />
+            <View className="flex-row gap-2">
+              <TextInput
+                className="flex-1 bg-[#c7c29b] h-10 rounded-xl px-4 text-black text-left"
+                placeholder="Nhập số..."
+                placeholderTextColor="#555"
+                keyboardType="numeric"
+                value={characterData[currentChar].spd}
+                onFocus={() => {
+                  setOpenDropdown(null);      // đóng dropdown
+                  setOpenSelectTab(null);     // đóng select tab
+                }}
+                onChangeText={(val) =>
+                  setCharacterData({
+                    ...characterData,
+                    [currentChar]: {
+                      ...characterData[currentChar],
+                      spd: val,
+                    },
+                  })
+                }
+              />
+
+              <TouchableOpacity
+                className="bg-[#8a947d] rounded-xl px-4 py-2 items-center justify-center"
+                onPress={() => {
+                  const charName = characters[currentChar - 1];
+                  if (!charName) {
+                    alert("Please select a character first");
+                    return;
+                  }
+
+                  // Find character ID from name
+                  const selectedChar = charactersData.find(c => c.name === charName);
+                  if (!selectedChar) {
+                    alert("Character not found");
+                    return;
+                  }
+
+                  // Fetch base speed from API
+                  getCharacterById(selectedChar.id)
+                    .then(charDetail => {
+                      if (charDetail) {
+                        setCharacterData(prev => ({
+                          ...prev,
+                          [currentChar]: {
+                            ...prev[currentChar],
+                            spd: charDetail.baseSpeed.toString(),
+                          }
+                        }));
+                      }
+                    })
+                    .catch(err => {
+                      console.error("Failed to fetch character speed:", err);
+                      alert("Failed to fetch character speed");
+                    });
+                }}
+              >
+                <Text className="text-white font-semibold">Get Speed</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
@@ -754,12 +844,12 @@ export default function HomeScreen() {
         context={openSelectTab}
         items={
           openSelectTab === "characters"
-            ? charactersData
+            ? charactersSelectData
             : openSelectTab === "lightcones"
-            ? lightconesData
+            ? lightconesSelectData
             : openSelectTab === "relicSet"
-            ? relicSetData
-            : planarSetData
+            ? relicsSelectData
+            : planarsSelectData
         }
         onClose={() => setOpenSelectTab(null)}
         onChoose={handleChoose}
