@@ -46,6 +46,15 @@
         "@sentry/react-native/expo",
         {
           "url": "https://sentry.io/",
+          "project": "react-native",
+          "organization": "custom-group-1"
+        }
+      ],
+      "sentry-expo",
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
           "project": "speed-rail",
           "organization": "custom-group-1"
         }
