@@ -7,7 +7,7 @@
  * Security: Never includes database credentials, only calls RESTful endpoints
  */
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://127.0.0.1:3000";
 
 // ============= TYPE DEFINITIONS =============
 
@@ -17,10 +17,13 @@ export interface Path {
 }
 
 export interface Character {
-  id: number;
+  characterId: number;
   name: string;
-  baseSpeed: number;
-  path: string;
+  baseSpeed: string;
+  path: {
+    pathId: number;
+    pathName: string;
+  };
 }
 
 export interface Move {
@@ -48,13 +51,13 @@ export interface CharacterDetail extends Character {
 }
 
 export interface Lightcone {
-  id: number;
+  lightconeId: number;
   name: string;
   path: string;
 }
 
 export interface RelicSet {
-  id: number;
+  relicId: number;
   name: string;
 }
 
@@ -155,26 +158,26 @@ const apiCall = async <T>(
 // ============= PATH ENDPOINTS =============
 
 /**
- * GET /api/paths
- * Fetch all available Paths (Destiny, Hunt, Erudition, etc.)
+ * GET /path
+ * Fetch all available path (Destiny, Hunt, Erudition, etc.)
  */
 export const getPaths = async (): Promise<Path[]> => {
-  return apiCall<Path[]>('/api/paths');
+  return apiCall<Path[]>('/path');
 };
 
 // ============= CHARACTER ENDPOINTS =============
 
 /**
- * GET /api/characters
+ * GET /characters
  * Fetch all characters with basic info (id, name, baseSpeed, path)
  * Used for populating character selection dropdowns
  */
 export const getCharacters = async (): Promise<Character[]> => {
-  return apiCall<Character[]>('/api/characters');
+  return apiCall<Character[]>('/characters');
 };
 
 /**
- * GET /api/characters/:id
+ * GET /characters/:id
  * Fetch single character with full details
  * Includes moves, eidolons, traces relationships
  * 
@@ -182,51 +185,51 @@ export const getCharacters = async (): Promise<Character[]> => {
  * @returns Character with all relationships populated
  */
 export const getCharacter = async (id: number): Promise<CharacterDetail> => {
-  return apiCall<CharacterDetail>(`/api/characters/${id}`);
+  return apiCall<CharacterDetail>(`/characters/${id}`);
 };
 
 // ============= LIGHTCONE ENDPOINTS =============
 
 /**
- * GET /api/lightcones
+ * GET /lightcones
  * Fetch all lightcones with path association
  * Used for lightcone selection in build configuration
  */
 export const getLightcones = async (): Promise<Lightcone[]> => {
-  return apiCall<Lightcone[]>('/api/lightcones');
+  return apiCall<Lightcone[]>('/lightcone');
 };
 
 /**
- * GET /api/lightcones/:id
+ * GET /lightcones/:id
  * Fetch single lightcone with full details
  * 
  * @param id Lightcone ID
  * @returns Lightcone with associated effects
  */
 export const getLightcone = async (id: number): Promise<Lightcone> => {
-  return apiCall<Lightcone>(`/api/lightcones/${id}`);
+  return apiCall<Lightcone>(`/lightcones/${id}`);
 };
 
 // ============= RELIC SET ENDPOINTS =============
 
 /**
- * GET /api/relic-sets
+ * GET /relic-set
  * Fetch all available relic sets
  * Used for relic selection in build configuration
  */
 export const getRelicSets = async (): Promise<RelicSet[]> => {
-  return apiCall<RelicSet[]>('/api/relic-sets');
+  return apiCall<RelicSet[]>('/relic-set');
 };
 
 /**
- * GET /api/relic-sets/:id
+ * GET /relic-set/:id
  * Fetch single relic set
  * 
  * @param id Relic set ID
  * @returns Relic set details
  */
 export const getRelicSet = async (id: number): Promise<RelicSet> => {
-  return apiCall<RelicSet>(`/api/relic-sets/${id}`);
+  return apiCall<RelicSet>(`/relic-set/${id}`);
 };
 
 // ============= TYPE GUARD HELPERS =============

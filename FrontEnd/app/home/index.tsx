@@ -147,7 +147,7 @@ export default function HomeScreen() {
     // Find the character in our local data to get the correct image
     const localChar = charactersData.find(c => c.name === char.name);
     return {
-      id: char.id,
+      id: char.characterId,
       name: char.name,
       image: localChar?.image || require("../../assets/images/Characters/Argenti.png"), // Use correct image or fallback
     };
@@ -157,23 +157,31 @@ export default function HomeScreen() {
     // Find lightcone in local data by name
     const localLc = lightconesData.find(l => l.name === lc.name);
     return {
-      id: lc.id,
+      id: lc.lightconeId,
       name: lc.name,
       image: localLc?.image || require("../../assets/images/Lightcones/A_Secret_Vow.png"), // Use correct image or fallback
     };
   });
 
-  const relicsSelectData: SelectItem[] = relicSets.map(rs => {
+  const relicsSelectData: SelectItem[] = relicSets.filter(rs => rs.relicId <= 15 && ![3].includes(rs.relicId)).map(rs => {
     // Find relic set in local data by name
     const localRelic = relicSetData.find(r => r.name === rs.name);
     return {
-      id: rs.id,
+      id: rs.relicId,
       name: rs.name,
       image: localRelic?.image || require("../../assets/images/Relic Sets/Band_of_Sizzling_Thunder.png"), // Use correct image or fallback
     };
   });
 
-  const planarsSelectData: SelectItem[] = []; // Planars endpoint not created yet
+  const planarsSelectData: SelectItem[] = relicSets.filter(rs => rs.relicId > 15 || [3].includes(rs.relicId)).map(rs => {
+    // Find planar set in local data by name
+    const localPlanar = planarSetData.find(p => p.name === rs.name);
+    return {
+      id: rs.relicId,
+      name: rs.name,
+      image: localPlanar?.image || require("../../assets/images/Planars/Belobog_of_the_Architects.png"), // Use correct image or fallback
+    };
+  });
 
   // ====================================================================
 
@@ -515,7 +523,10 @@ export default function HomeScreen() {
                 onPress={() => { setRelicSelectingSlot("relic1"); handlePressSelect("relicSet"); }}
                 className="bg-[#c7c29b] rounded-xl flex-row items-center px-3 py-2 flex-1 mr-2"
               >
-                <Image source={require("../../assets/images/sample.png")} className="w-6 h-6 mr-2 rounded-full" />
+                <Image 
+                  source={relicSetData.find(r => r.name === characterData[currentChar].relic1)?.image || require("../../assets/images/sample.png")} 
+                  className="w-6 h-6 mr-2 rounded-full" 
+                />
                 <Text 
                   className="font-medium flex-1" 
                   numberOfLines={1} 
@@ -535,7 +546,7 @@ export default function HomeScreen() {
                 }`}
               >
                 <Image
-                  source={require("../../assets/images/sample.png")}
+                  source={relicSetData.find(r => r.name === characterData[currentChar].relic2)?.image || require("../../assets/images/sample.png")}
                   className={`w-6 h-6 mr-2 rounded-full ${
                     characterData[currentChar].relicSet === "Set 4" ? "opacity-50" : "opacity-100"
                   }`}
@@ -560,7 +571,10 @@ export default function HomeScreen() {
                   onPress={() => handlePressSelect("planarSet")}
                   className="bg-[#c7c29b] rounded-xl flex-row items-center px-3 py-2 flex-1"
                 >
-                  <Image source={require("../../assets/images/sample.png")} className="w-6 h-6 mr-2 rounded-full" />
+                  <Image 
+                    source={planarSetData.find(p => p.name === characterData[currentChar].planarSet)?.image || require("../../assets/images/sample.png")} 
+                    className="w-6 h-6 mr-2 rounded-full" 
+                  />
                   <Text className="font-medium">{characterData[currentChar].planarSet || "Planar"}</Text>
                 </TouchableOpacity>
               </View>
@@ -628,7 +642,7 @@ export default function HomeScreen() {
                     });
                 }}
               >
-                <Text className="text-white font-semibold">Get Speed</Text>
+                <Text className="text-white font-semibold">Default Spd</Text>
               </TouchableOpacity>
             </View>
           </View>
