@@ -7,26 +7,64 @@ import {
     TextInput,
     TouchableOpacity,
     View,
+    ActivityIndicator,
+    Alert
 } from "react-native";
+import { authApi, getErrorMessage } from "../../utils/api";
 
-export default function ChangePasswordScreen() {
+export default function CodeCheckScreen() {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
-  const [timeLeft, setTimeLeft] = useState(60);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [loadingSend, setLoadingSend] = useState(false);
+  const [loadingVerify, setLoadingVerify] = useState(false);
 
   const router = useRouter();
 
-  const handleSendCode = () => {
-    //WIP
+  const handleSendCode = async () => {
+    if (!email || !email.includes('@')) {
+        Alert.alert("Error", "Please enter a valid email address.");
+        return;
+    }
+
+    setLoadingSend(true);
+    try {
+        await authApi.sendForgotPasswordCode(email);
+        setTimeLeft(60); // Reset timer
+        Alert.alert("Code Sent", "Please check your email for the verification code.");
+    } catch (error) {
+        Alert.alert("Failed to send code", getErrorMessage(error));
+    } finally {
+        setLoadingSend(false);
+    }
   };
 
-  const handleCheckCode = () => {
-    //WIP
-    router.replace("/auth/password");
+  const handleCheckCode = async () => {
+    if (!code || !email) {
+        Alert.alert("Error", "Please enter your email and the code.");
+        return;
+    }
+
+    setLoadingVerify(true);
+    try {
+        const result = await authApi.verifyCode(email, code);
+        if (result.valid) {
+             // Pass email and code to the password reset screen
+             router.replace({
+                pathname: "/auth/password",
+                params: { email, code }
+            });
+        } else {
+            Alert.alert("Error", "Invalid verification code.");
+        }
+    } catch (error) {
+        Alert.alert("Verification Failed", getErrorMessage(error));
+    } finally {
+        setLoadingVerify(false);
+    }
   };
 
   const handleLogin = () => {
-    //WIP
     router.replace("/auth/login");
   };
 
@@ -65,13 +103,23 @@ export default function ChangePasswordScreen() {
                 placeholderTextColor="#555"
                 value={email}
                 onChangeText={setEmail}
-                secureTextEntry
+                autoCapitalize="none"
+                keyboardType="email-address"
             />
             <TouchableOpacity
-            className="px-3"
-            onPress={handleSendCode}
+                className="px-3"
+                onPress={handleSendCode}
+                disabled={timeLeft > 0 || loadingSend}
             >
-            <Ionicons name="send" size={24} color="#58669A" />
+                {loadingSend ? (
+                    <ActivityIndicator size="small" color="#58669A" />
+                ) : (
+                    <Ionicons 
+                        name="send" 
+                        size={24} 
+                        color={timeLeft > 0 ? "#ccc" : "#58669A"} 
+                    />
+                )}
             </TouchableOpacity>
         </View>
 
@@ -83,24 +131,35 @@ export default function ChangePasswordScreen() {
                 placeholderTextColor="#555"
                 value={code}
                 onChangeText={setCode}
-                secureTextEntry
+                keyboardType="numeric"
             />
         </View>
         
         <View className="flex-row justify-between items-center mb-6">
             <View className="flex-row justify-between items-center mb-6">
-                <Text className="text-white">
-                    Mã hết hạn sau {timeLeft}s
-                </Text>
+                {timeLeft > 0 ? (
+                    <Text className="text-white">
+                        Mã hết hạn sau {timeLeft}s
+                    </Text>
+                ) : (
+                    <Text className="text-gray-400">
+                        Nhấn nút gửi để nhận mã
+                    </Text>
+                )}
             </View>
         </View>
 
         {/* Buttons */}
         <TouchableOpacity 
-            className="bg-[#58669A] py-3 rounded-lg mb-4"
+            className={`bg-[#58669A] py-3 rounded-lg mb-4 flex-row justify-center ${loadingVerify ? 'opacity-70' : ''}`}
             onPress={() => handleCheckCode()}
+            disabled={loadingVerify}
         >
-            <Text className="text-white text-center font-bold">Change Password</Text>
+             {loadingVerify ? (
+                <ActivityIndicator color="white" />
+            ) : (
+                <Text className="text-white text-center font-bold">Verify Code</Text>
+            )}
         </TouchableOpacity>
 
         {/* Sign in */}

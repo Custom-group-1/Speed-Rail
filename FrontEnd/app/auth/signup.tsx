@@ -6,13 +6,18 @@ import {
     TextInput,
     TouchableOpacity,
     View,
+    ActivityIndicator,
+    Alert
 } from "react-native";
+import { authApi, getErrorMessage, setAuthToken } from "../../utils/api";
 
 export default function SignupScreen() {
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repassword, setRePassword] = useState("");
   const [remember, setRemember] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
@@ -20,8 +25,37 @@ export default function SignupScreen() {
     router.replace("/auth/login");
   };
 
-  const handleSignUp = () => {
-    router.replace("/home");
+  const handleSignUp = async () => {
+    if (!email || !username || !password) {
+        Alert.alert("Error", "Please fill in all fields.");
+        return;
+    }
+
+    if (password !== repassword) {
+        Alert.alert("Error", "Passwords do not match.");
+        return;
+    }
+
+    setIsLoading(true);
+    try {
+        const response = await authApi.signup({
+            email,
+            username,
+            password
+        });
+        
+        // Auto login after signup
+        setAuthToken(response.token);
+        
+        Alert.alert("Success", "Account created successfully!", [
+            { text: "OK", onPress: () => router.replace("/home") }
+        ]);
+
+    } catch (error) {
+        Alert.alert("Signup Failed", getErrorMessage(error));
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   return (
@@ -47,10 +81,23 @@ export default function SignupScreen() {
             <View className="w-3 h-full bg-[#58669A] rounded-l-lg" />
             <TextInput
                 className="flex-1 px-4 py-3 text-black"
-                placeholder="Username or Email"
+                placeholder="Username (e.g. Trailblazer)"
+                placeholderTextColor="#555"
+                value={username}
+                onChangeText={setUsername}
+            />
+        </View>
+
+        <View className="flex-row items-center bg-white rounded-lg mb-4">
+            <View className="w-3 h-full bg-[#58669A] rounded-l-lg" />
+            <TextInput
+                className="flex-1 px-4 py-3 text-black"
+                placeholder="Email"
                 placeholderTextColor="#555"
                 value={email}
                 onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
             />
         </View>
 
@@ -70,7 +117,7 @@ export default function SignupScreen() {
             <View className="w-3 h-full bg-[#58669A] rounded-l-lg" />
             <TextInput
                 className="flex-1 px-4 py-3 text-black"
-                placeholder="Password"
+                placeholder="Re-enter Password"
                 placeholderTextColor="#555"
                 value={repassword}
                 onChangeText={setRePassword}
@@ -98,10 +145,15 @@ export default function SignupScreen() {
 
         {/* Buttons */}
         <TouchableOpacity 
-            className="bg-[#58669A] py-3 rounded-lg mb-4"
+            className={`bg-[#58669A] py-3 rounded-lg mb-4 flex-row justify-center ${isLoading ? 'opacity-70' : ''}`}
             onPress={() => handleSignUp()}
+            disabled={isLoading || password !== repassword}
         >
-            <Text className="text-white text-center font-bold">Sign up</Text>
+             {isLoading ? (
+                <ActivityIndicator color="white" />
+            ) : (
+                <Text className="text-white text-center font-bold">Sign up</Text>
+            )}
         </TouchableOpacity>
 
         {/* Sign in */}
