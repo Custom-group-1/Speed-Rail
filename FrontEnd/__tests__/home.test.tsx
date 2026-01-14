@@ -3,6 +3,29 @@ import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import HomeScreen from '../app/home/index';
 import Dropdown from '../components/Dropdown';
 import SelectTab from '../components/SelectTab';
+//
+jest.mock('../utils/useGameData', () => ({
+  useGameData: () => ({
+    loading: false,
+    error: null,
+    characters: [
+      { characterId: 1, name: 'Himeko' },
+      { characterId: 2, name: 'UnknownChar' } // trigger fallback image
+    ],
+    lightcones: [
+      { lightconeId: 1, name: 'UnknownLightcone' }
+    ],
+    relicSets: [
+      { relicId: 1, name: 'Band of Sizzling Thunder' },
+      { relicId: 3, name: 'Broken Keel' },   // planar special
+      { relicId: 16, name: 'Fleet of the Ageless' }
+    ],
+    getCharacterById: jest.fn()
+      .mockResolvedValueOnce({ baseSpeed: 90 })
+      .mockRejectedValueOnce(new Error('API error'))
+  })
+}));
+
 
 // Mock the Dropdown component
 jest.mock('../components/Dropdown', () => {
