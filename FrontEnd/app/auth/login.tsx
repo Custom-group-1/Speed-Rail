@@ -1,23 +1,44 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    ImageBackground,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ImageBackground,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
+import { authApi, getErrorMessage, setAuthToken } from "../../utils/api";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
-  const handleLogin = () => {
-    //WIP
-    router.replace("/home");
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await authApi.login({ email, password });
+      
+      // Store token internally in API service
+      setAuthToken(response.token);
+      
+      // Navigate to Home
+      router.replace("/home");
+    } catch (error) {
+      Alert.alert("Login Failed", getErrorMessage(error));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -61,6 +82,7 @@ export default function LoginScreen() {
                 placeholderTextColor="#555"
                 value={email}
                 onChangeText={setEmail}
+                autoCapitalize="none"
             />
         </View>
 
@@ -97,10 +119,15 @@ export default function LoginScreen() {
 
         {/* Buttons */}
         <TouchableOpacity 
-            className="bg-[#58669A] py-3 rounded-lg mb-4"
+            className={`bg-[#58669A] py-3 rounded-lg mb-4 flex-row justify-center items-center ${isLoading ? 'opacity-70' : ''}`}
             onPress={() => handleLogin()}
+            disabled={isLoading}
         >
-            <Text className="text-white text-center font-bold">Login</Text>
+            {isLoading ? (
+                <ActivityIndicator color="white" />
+            ) : (
+                <Text className="text-white text-center font-bold">Login</Text>
+            )}
         </TouchableOpacity>
 
         <TouchableOpacity 

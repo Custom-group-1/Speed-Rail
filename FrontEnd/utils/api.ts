@@ -9,6 +9,16 @@
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://127.0.0.1:3000";
 
+// ============= TOKEN MANAGEMENT =============
+
+let authToken: string | null = null;
+
+export const setAuthToken = (token: string | null) => {
+  authToken = token;
+};
+
+export const getAuthToken = () => authToken;
+
 // ============= TYPE DEFINITIONS =============
 
 export interface Path {
@@ -65,6 +75,28 @@ export interface ApiError {
   message: string;
   status: number;
   code?: string;
+}
+
+// --- AUTH TYPES ---
+
+export interface AuthResponse {
+  token: string;
+  user: {
+    id: number;
+    email: string;
+    username: string;
+  };
+}
+
+export interface LoginRequest {
+  email: string; 
+  password: string;
+}
+
+export interface SignupRequest {
+  email: string;
+  username: string;
+  password: string;
 }
 
 // ============= ERROR HANDLING =============
@@ -124,6 +156,15 @@ const apiCall = async <T>(
 ): Promise<T> => {
   const url = `${API_BASE_URL}${endpoint}`;
 
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...((options.headers as Record<string, string>) || {}),
+  };
+
+  if (authToken) {
+    headers['Authorization'] = `Bearer ${authToken}`;
+  }
+
   try {
     const response = await fetchWithTimeout(url, {
       headers: {
@@ -152,6 +193,45 @@ const apiCall = async <T>(
       error instanceof Error ? error.message : 'Unknown error',
       500
     );
+  }
+};
+
+// ============= AUTH ENDPOINTS =============
+
+export const authApi = {
+  login: async (data: LoginRequest): Promise<AuthResponse> => {
+    return apiCall<AuthResponse>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  signup: async (data: SignupRequest): Promise<AuthResponse> => {
+    return apiCall<AuthResponse>('/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  sendForgotPasswordCode: async (email: string): Promise<{ message: string }> => {
+    return apiCall<{ message: string }>('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  verifyCode: async (email: string, code: string): Promise<{ valid: boolean }> => {
+    return apiCall<{ valid: boolean }>('/auth/verify-code', {
+      method: 'POST',
+      body: JSON.stringify({ email, code }),
+    });
+  },
+
+  resetPassword: async (email: string, code: string, newPassword: string): Promise<{ message: string }> => {
+    return apiCall<{ message: string }>('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ email, code, newPassword }),
+    });
   }
 };
 

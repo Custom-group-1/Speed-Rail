@@ -36,6 +36,9 @@
       "js",
       "jsx"
     ],
+    "moduleNameMapper": {
+      "\\.css$": "<rootDir>/__mocks__/styleMock.js"
+    },
     "testMatch": [
       "**/__tests__/**/*.[jt]s?(x)",
       "**/?(*.)+(spec|test).[jt]s?(x)"

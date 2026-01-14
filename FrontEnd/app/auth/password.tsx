@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
     ImageBackground,
@@ -6,12 +6,19 @@ import {
     TextInput,
     TouchableOpacity,
     View,
+    ActivityIndicator,
+    Alert
 } from "react-native";
+import { authApi, getErrorMessage } from "../../utils/api";
 
 export default function ChangePasswordScreen() {
+  const params = useLocalSearchParams();
+  const { email, code } = params;
+
   const [password, setPassword] = useState("");
   const [repassword, setRePassword] = useState("");
   const [remember, setRemember] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
@@ -19,9 +26,33 @@ export default function ChangePasswordScreen() {
     router.replace("/auth/login");
   };
 
-  const handleSuccess = () => {
-    //WIP
-    router.replace("/home");
+  const handleSuccess = async () => {
+    if (password !== repassword) {
+        Alert.alert("Error", "Passwords do not match.");
+        return;
+    }
+
+    if (!email || !code) {
+        Alert.alert("Error", "Missing reset information. Please start over.");
+        router.replace("/auth/codecheck");
+        return;
+    }
+
+    setIsLoading(true);
+    try {
+        await authApi.resetPassword(
+            email as string, 
+            code as string, 
+            password
+        );
+        Alert.alert("Success", "Password changed successfully!", [
+            { text: "Login Now", onPress: () => router.replace("/auth/login") }
+        ]);
+    } catch (error) {
+        Alert.alert("Failed", getErrorMessage(error));
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   return (
@@ -39,7 +70,7 @@ export default function ChangePasswordScreen() {
             Web app for calculating speed in Honkai: Star Rail
         </Text>
         <Text className="text-white text-left mb-6">
-            Hãy để Ponmai giúp bạn lấy lại mật khẩu
+            Hãy nhập mật khẩu mới
         </Text>
 
         {/* Inputs */}
@@ -47,7 +78,7 @@ export default function ChangePasswordScreen() {
             <View className="w-3 h-full bg-[#58669A] rounded-l-lg" />
             <TextInput
                 className="flex-1 px-4 py-3 text-black"
-                placeholder="Password"
+                placeholder="New Password"
                 placeholderTextColor="#555"
                 value={password}
                 onChangeText={setPassword}
@@ -59,7 +90,7 @@ export default function ChangePasswordScreen() {
             <View className="w-3 h-full bg-[#58669A] rounded-l-lg" />
             <TextInput
                 className="flex-1 px-4 py-3 text-black"
-                placeholder="Re-enter Password"
+                placeholder="Re-enter New Password"
                 placeholderTextColor="#555"
                 value={repassword}
                 onChangeText={setRePassword}
@@ -87,15 +118,19 @@ export default function ChangePasswordScreen() {
 
         {/* Buttons */}
         <TouchableOpacity
-            className={`py-3 rounded-lg mb-4 ${
-                password === repassword && password.length > 0
+            className={`py-3 rounded-lg mb-4 flex-row justify-center ${
+                password === repassword && password.length > 0 && !isLoading
                 ? "bg-[#58669A]"
                 : "bg-gray-400"
             }`}
             onPress={() => handleSuccess()}
-            disabled={password !== repassword || password.length === 0}
+            disabled={password !== repassword || password.length === 0 || isLoading}
             >
-            <Text className="text-white text-center font-bold">Login</Text>
+            {isLoading ? (
+                <ActivityIndicator color="white" />
+            ) : (
+                <Text className="text-white text-center font-bold">Reset Password</Text>
+            )}
         </TouchableOpacity>
 
         {/* Sign in */}
