@@ -85,6 +85,10 @@ function RootLayout() {
     Sentry.setTag("group", "nhom-4-nguoi");
   }, []);
 
+  useEffect(() => {
+    setShowProfile(false);
+  }, [pathname]);
+
   return (
     <View style={styles.container}>
       <StatusBar hidden />
@@ -103,7 +107,10 @@ function RootLayout() {
       )}
 
       {showProfile && !isOnboarding && (
-        <MiniProfile onClose={() => setShowProfile(false)} />
+        <>
+          <TouchableOpacity style={styles.fullOverlay} onPress={() => setShowProfile(false)} />
+          <MiniProfile onClose={() => setShowProfile(false)} />
+        </>
       )}
 
       <Slot />
@@ -134,6 +141,15 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
+  },
+  fullOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'transparent',
+    zIndex: 8,
   },
 });
 
