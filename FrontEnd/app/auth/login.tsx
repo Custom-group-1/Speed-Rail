@@ -139,7 +139,7 @@ export default function LoginScreen() {
 
         {/* Sign up */}
         <View className="flex-row justify-center">
-            <Text className="text-white">Don't have an account? </Text>
+            <Text className="text-white">Don&apos;t have an account? </Text>
             <TouchableOpacity onPress={() => handleSignUp()}>
             <Text className="text-[#58669A] underline">Sign up now!</Text>
             </TouchableOpacity>

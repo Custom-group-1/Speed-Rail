@@ -42,7 +42,7 @@ export default function SelectTab({ onClose, onChoose, context, items }: SelectT
       tension: 50,
       friction: 10,
     }).start();
-  }, []);
+  }, [slideAnim]);
 
   const closeTab = () => {
     // 3. Trượt xuống trước khi đóng

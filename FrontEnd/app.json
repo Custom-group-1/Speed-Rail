@@ -7,7 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "demoapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
@@ -20,7 +19,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.vck2004.demoapp"
+      "package": "com.vck2004.demoapp",
+      "usesCleartextTraffic": true
     },
     "web": {
       "output": "static",

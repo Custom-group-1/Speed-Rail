@@ -1,14 +1,13 @@
 import { useRouter } from "expo-router";
-import React, { useRef, useState, useEffect } from "react";
-import { Animated, Image, ImageBackground, Text, TextInput, TouchableOpacity, View, ActivityIndicator } from "react-native";
+import React, { useRef, useState } from "react";
+import { Animated, Image, ImageBackground, Text, TextInput, TouchableOpacity, View } from "react-native";
 import Dropdown from "../../components/Dropdown";
 import SelectTab, { SelectItem } from "../../components/SelectTab";
 import { useGameData } from "../../utils/useGameData";
-import { Character } from "../../utils/api";
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { characters: apiCharacters, lightcones, relicSets, loading, error, getCharacterById } = useGameData();
+  const { characters: apiCharacters, lightcones, relicSets, getCharacterById } = useGameData();
   
   const [currentChar, setCurrentChar] = useState(1);
   const [characters, setCharacters] = useState<string[]>(["", "", "", ""]);
@@ -257,38 +256,6 @@ export default function HomeScreen() {
 
     setOpenSelectTab(null);
   };
-
-  const actions = React.useMemo(() => {
-    const DEFAULT_SPD = 100;
-    const lowerAvLimit = cycle === 0 ? 0 : 150 + (cycle - 1) * 100;
-    const upperAvLimit = 150 + cycle * 100;
-    
-    let allActions: { charIndex: number; name: string; av: number }[] = [];
-
-    [1, 2, 3, 4].forEach((idx) => {
-      const charName = characters[idx - 1];
-      if (!charName || charName === "") return;
-
-      const rawSpd = parseFloat(characterData[idx].spd);
-      const spd = isNaN(rawSpd) || rawSpd <= 0 ? DEFAULT_SPD : rawSpd;
-
-      const actionInterval = 10000 / spd;
-      let accumulatedAv = actionInterval;
-
-      while (accumulatedAv <= upperAvLimit) {
-        if (accumulatedAv > lowerAvLimit) {
-          allActions.push({
-            charIndex: idx,
-            name: charName,
-            av: accumulatedAv,
-          });
-        }
-        accumulatedAv += actionInterval;
-      }
-    });
-
-    return allActions.sort((a, b) => a.av - b.av);
-  }, [characters, characterData, cycle]);
 
   // 1. Logic tính toán Actions (Đã tối ưu để gom nhóm)
   const timelineGroups = React.useMemo(() => {
