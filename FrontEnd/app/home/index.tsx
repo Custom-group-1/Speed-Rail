@@ -822,6 +822,7 @@ export default function HomeScreen() {
               </View>
             ) : (
               <TouchableOpacity
+                testID="cycle-display"
                 onPress={() => {
                   setCycleInput(cycle.toString());
                   setEditingCycle(true);
@@ -829,7 +830,7 @@ export default function HomeScreen() {
                 className="flex-row items-center"
               >
                 <Text className="text-white font-semibold text-lg mr-2">Cycle:</Text>
-                <Text className="font-semibold text-lg">{cycle}</Text>
+                <Text testID="cycle-value" className="font-semibold text-lg">{cycle}</Text>
               </TouchableOpacity>
             )}
 

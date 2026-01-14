@@ -37,7 +37,7 @@ jest.mock('../components/SelectTab', () => {
         </TouchableOpacity>
         <TouchableOpacity
           testID="select-tab-choose"
-          onPress={() => onChoose(items[0], context)}
+          onPress={() => onChoose(items && items.length > 0 ? items[0] : { name: 'Test Item' }, context)}
         >
           <Text>Choose First Item</Text>
         </TouchableOpacity>
@@ -91,9 +91,9 @@ describe('HomeScreen', () => {
     });
 
     it('renders cycle control box', () => {
-      const { getByText } = render(<HomeScreen />);
+      const { getByText, getByTestId } = render(<HomeScreen />);
       expect(getByText('Cycle:')).toBeTruthy();
-      expect(getByText('0')).toBeTruthy();
+      expect(getByTestId('cycle-value')).toHaveTextContent('0');
     });
 
     it('renders all dropdown components', () => {
@@ -588,8 +588,8 @@ describe('HomeScreen', () => {
 
   describe('Cycle Control Tests', () => {
     it('displays initial cycle value of 0', () => {
-      const { getByText } = render(<HomeScreen />);
-      expect(getByText('0')).toBeTruthy();
+      const { getByTestId } = render(<HomeScreen />);
+      expect(getByTestId('cycle-value')).toHaveTextContent('0');
     });
 
     it('increments cycle when up button pressed', () => {
@@ -617,17 +617,17 @@ describe('HomeScreen', () => {
     });
 
     it('does not go below 0 when decrementing', () => {
-      const { getByText } = render(<HomeScreen />);
+      const { getByText, getByTestId } = render(<HomeScreen />);
       const downButton = getByText('▼');
       
       fireEvent.press(downButton);
       
-      expect(getByText('0')).toBeTruthy();
+      expect(getByTestId('cycle-value')).toHaveTextContent('0');
     });
 
     it('opens cycle input when cycle display pressed', () => {
-      const { getByText, queryByDisplayValue } = render(<HomeScreen />);
-      const cycleDisplay = getByText('0');
+      const { getByTestId, queryByDisplayValue } = render(<HomeScreen />);
+      const cycleDisplay = getByTestId('cycle-display');
       
       fireEvent.press(cycleDisplay);
       
@@ -635,8 +635,8 @@ describe('HomeScreen', () => {
     });
 
     it('updates cycle value when input is submitted', () => {
-      const { getByText, getByDisplayValue } = render(<HomeScreen />);
-      const cycleDisplay = getByText('0');
+      const { getByTestId, getByDisplayValue } = render(<HomeScreen />);
+      const cycleDisplay = getByTestId('cycle-display');
       
       fireEvent.press(cycleDisplay);
       
@@ -644,12 +644,12 @@ describe('HomeScreen', () => {
       fireEvent.changeText(input, '5');
       fireEvent(input, 'submitEditing');
       
-      expect(getByText('5')).toBeTruthy();
+      expect(getByTestId('cycle-value')).toHaveTextContent('5');
     });
 
     it('updates cycle value when input loses focus', () => {
-      const { getByText, getByDisplayValue } = render(<HomeScreen />);
-      const cycleDisplay = getByText('0');
+      const { getByTestId, getByDisplayValue } = render(<HomeScreen />);
+      const cycleDisplay = getByTestId('cycle-display');
       
       fireEvent.press(cycleDisplay);
       
@@ -657,12 +657,12 @@ describe('HomeScreen', () => {
       fireEvent.changeText(input, '7');
       fireEvent(input, 'blur');
       
-      expect(getByText('7')).toBeTruthy();
+      expect(getByTestId('cycle-value')).toHaveTextContent('7');
     });
 
     it('rejects negative cycle values on submit', () => {
-      const { getByText, getByDisplayValue } = render(<HomeScreen />);
-      const cycleDisplay = getByText('0');
+      const { getByTestId, getByDisplayValue } = render(<HomeScreen />);
+      const cycleDisplay = getByTestId('cycle-display');
       
       fireEvent.press(cycleDisplay);
       
@@ -671,12 +671,12 @@ describe('HomeScreen', () => {
       fireEvent(input, 'submitEditing');
       
       // Should remain 0
-      expect(getByText('0')).toBeTruthy();
+      expect(getByTestId('cycle-value')).toHaveTextContent('0');
     });
 
     it('rejects invalid (NaN) cycle values on blur', () => {
-      const { getByText, getByDisplayValue } = render(<HomeScreen />);
-      const cycleDisplay = getByText('0');
+      const { getByTestId, getByDisplayValue } = render(<HomeScreen />);
+      const cycleDisplay = getByTestId('cycle-display');
       
       fireEvent.press(cycleDisplay);
       
@@ -685,12 +685,12 @@ describe('HomeScreen', () => {
       fireEvent(input, 'blur');
       
       // Should remain 0
-      expect(getByText('0')).toBeTruthy();
+      expect(getByTestId('cycle-value')).toHaveTextContent('0');
     });
 
     it('handles cycle input text changes', () => {
-      const { getByText, getByDisplayValue } = render(<HomeScreen />);
-      const cycleDisplay = getByText('0');
+      const { getByTestId, getByDisplayValue } = render(<HomeScreen />);
+      const cycleDisplay = getByTestId('cycle-display');
       
       fireEvent.press(cycleDisplay);
       

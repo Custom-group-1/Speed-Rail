@@ -29,10 +29,12 @@ jest.mock('expo-constants', () => ({
   default: {
     expoConfig: {},
     manifest: {},
+    appOwnership: 'standalone',
   },
   Constants: {
     expoConfig: {},
     manifest: {},
+    appOwnership: 'standalone',
   },
 }));
 
@@ -43,12 +45,17 @@ jest.mock('expo-font', () => ({
   isLoading: jest.fn(() => false),
 }));
 
-// Mock expo-asset
-jest.mock('expo-asset', () => ({
-  Asset: {
-    loadAsync: jest.fn(() => Promise.resolve()),
-    fromModule: jest.fn(() => ({ uri: 'mock-uri' })),
-  },
+// Mock @sentry/react-native
+jest.mock('@sentry/react-native', () => ({
+  init: jest.fn(),
+  setUser: jest.fn(),
+  setTag: jest.fn(),
+  reactNavigationIntegration: jest.fn(() => ({
+    registerNavigationContainer: jest.fn(),
+  })),
+  wrap: jest.fn((component) => component),
+  mobileReplayIntegration: jest.fn(),
+  hermesProfilingIntegration: jest.fn(),
 }));
 
 // Mock @expo/vector-icons
@@ -69,10 +76,10 @@ jest.mock('@expo/vector-icons', () => {
   };
 });
 
-// Mock DevMenu
-jest.mock('react-native/Libraries/Utilities/DevSettings', () => ({
-  addMenuItem: jest.fn(),
-  reload: jest.fn(),
+// Mock expo-navigation-bar
+jest.mock('expo-navigation-bar', () => ({
+  setVisibilityAsync: jest.fn(),
+  setBehaviorAsync: jest.fn(),
 }));
 
 // Mock AsyncStorage
