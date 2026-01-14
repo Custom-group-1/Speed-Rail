@@ -84,7 +84,7 @@ export interface AuthResponse {
   user: {
     id: number;
     email: string;
-    username: string;
+    name: string;
   };
 }
 
@@ -95,7 +95,7 @@ export interface LoginRequest {
 
 export interface SignupRequest {
   email: string;
-  username: string;
+  name: string;
   password: string;
 }
 

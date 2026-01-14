@@ -12,7 +12,7 @@ import {
 import { authApi, getErrorMessage, setAuthToken } from "../../utils/api";
 
 export default function SignupScreen() {
-  const [username, setUsername] = useState("");
+  const [name, setname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repassword, setRePassword] = useState("");
@@ -26,7 +26,7 @@ export default function SignupScreen() {
   };
 
   const handleSignUp = async () => {
-    if (!email || !username || !password) {
+    if (!email || !name || !password) {
         Alert.alert("Error", "Please fill in all fields.");
         return;
     }
@@ -40,7 +40,7 @@ export default function SignupScreen() {
     try {
         const response = await authApi.signup({
             email,
-            username,
+            name,
             password
         });
         
@@ -81,10 +81,10 @@ export default function SignupScreen() {
             <View className="w-3 h-full bg-[#58669A] rounded-l-lg" />
             <TextInput
                 className="flex-1 px-4 py-3 text-black"
-                placeholder="Username (e.g. Trailblazer)"
+                placeholder="name (e.g. Trailblazer)"
                 placeholderTextColor="#555"
-                value={username}
-                onChangeText={setUsername}
+                value={name}
+                onChangeText={setname}
             />
         </View>
 
